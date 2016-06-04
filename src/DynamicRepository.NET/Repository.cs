@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections;
-using Microsoft.EntityFrameworkCore;
 using DynamicRepository.Filter;
-using LinqKit.Core;
+using LinqKit;
 using DynamicRepository.Reflection;
+using System.Data.Entity;
 
 namespace DynamicRepository.Core
 {
@@ -59,7 +59,15 @@ namespace DynamicRepository.Core
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public virtual Entity Get(Key key)
         {
-            throw new NotImplementedException();
+            if (key is Array)
+            {
+                // This is to handle entity framework find by composite key
+                return DbSet.Find((key as IEnumerable).Cast<object>().ToArray());
+            }
+            else
+            {
+                return DbSet.Find(key);
+            }
         }
 
         /// <summary>
@@ -191,7 +199,7 @@ namespace DynamicRepository.Core
                         // Checks if it is not the first level of depth that holds the collection
                         if (firstLevelPropInfo == typeof(string) || !typeof(IEnumerable).IsAssignableFrom(firstLevelPropInfo))
                         {
-                            // Raise it since multi depth is not supported ATM.
+                            // Seriously, this is too much innovation if it happens.
                             throw new Exception($"{nameof(this.GetPagedDataSource)} method does not support to filter in collections which are not in the first level of depth. . Please try using {nameof(AddExtraPagedDataSourceFilter)} for more advanced queries.");
                         }
                     }
@@ -275,35 +283,32 @@ namespace DynamicRepository.Core
         /// <returns>The string lambda expression.</returns>
         private Expression<Func<Entity, bool>> MergeFilters(PagedDataSourceSettings settings, string expression, bool isAllSearch = false)
         {
-            // TODO : Wait for this reply => https://github.com/StefH/System.Linq.Dynamic.Core/issues/22
-            //var expression1 = !String.IsNullOrEmpty(expression) ? System.Linq.Dynamic.DynamicExpression.ParseLambda<Entity, bool>(expression, null) : null;
-            //var expression2 = AddExtraPagedDataSourceFilter(settings);
+            var expression1 = !String.IsNullOrEmpty(expression) ? System.Linq.Dynamic.DynamicExpression.ParseLambda<Entity, bool>(expression, null) : null;
+            var expression2 = AddExtraPagedDataSourceFilter(settings);
 
-            //if (expression1 == null && expression2 == null)
-            //{
-            //    return x => 1 == 1;
-            //}
-            //else if (expression1 != null && expression2 != null)
-            //{
-            //    if (isAllSearch)
-            //    {
-            //        return PredicateBuilder.Or(expression1, expression2);
-            //    }
-            //    else
-            //    {
-            //        return PredicateBuilder.And(expression1, expression2);
-            //    }
-            //}
-            //else if (expression1 == null)
-            //{
-            //    return expression2;
-            //}
-            //else
-            //{
-            //    return expression1;
-            //}
-
-            throw new NotImplementedException();
+            if (expression1 == null && expression2 == null)
+            {
+                return x => 1 == 1;
+            }
+            else if (expression1 != null && expression2 != null)
+            {
+                if (isAllSearch)
+                {
+                    return PredicateBuilder.Or(expression1, expression2);
+                }
+                else
+                {
+                    return PredicateBuilder.And(expression1, expression2);
+                }
+            }
+            else if (expression1 == null)
+            {
+                return expression2;
+            }
+            else
+            {
+                return expression1;
+            }
         }
 
         #endregion
