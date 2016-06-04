@@ -59,7 +59,15 @@ namespace DynamicRepository.Core
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public virtual Entity Get(Key key)
         {
-            throw new NotImplementedException();
+            if (key is Array)
+            {
+                // This is to handle entity framework find by composite key
+                return DbSet.Find((key as IEnumerable).Cast<object>().ToArray());
+            }
+            else
+            {
+                return DbSet.Find(key);
+            }
         }
 
         /// <summary>
@@ -275,35 +283,34 @@ namespace DynamicRepository.Core
         /// <returns>The string lambda expression.</returns>
         private Expression<Func<Entity, bool>> MergeFilters(PagedDataSourceSettings settings, string expression, bool isAllSearch = false)
         {
-            // TODO : Wait for this reply => https://github.com/StefH/System.Linq.Dynamic.Core/issues/22
-            //var expression1 = !String.IsNullOrEmpty(expression) ? System.Linq.Dynamic.DynamicExpression.ParseLambda<Entity, bool>(expression, null) : null;
-            //var expression2 = AddExtraPagedDataSourceFilter(settings);
+            var expression1 = !String.IsNullOrEmpty(expression) ? System.Linq.Dynamic.Core.DynamicExpression.ParseLambda(false, typeof(Entity), typeof(bool), expression, null) : null;
+            var expression2 = AddExtraPagedDataSourceFilter(settings);
 
-            //if (expression1 == null && expression2 == null)
-            //{
-            //    return x => 1 == 1;
-            //}
-            //else if (expression1 != null && expression2 != null)
-            //{
-            //    if (isAllSearch)
-            //    {
-            //        return PredicateBuilder.Or(expression1, expression2);
-            //    }
-            //    else
-            //    {
-            //        return PredicateBuilder.And(expression1, expression2);
-            //    }
-            //}
-            //else if (expression1 == null)
-            //{
-            //    return expression2;
-            //}
-            //else
-            //{
-            //    return expression1;
-            //}
+            var typedExpression1 = (Expression<Func<Entity, bool>>) Expression.Lambda(expression1, null);
 
-            throw new NotImplementedException();
+            if (expression1 == null && expression2 == null)
+            {
+                return x => 1 == 1;
+            }
+            else if (expression1 != null && expression2 != null)
+            {
+                if (isAllSearch)
+                {
+                    return PredicateBuilder.Or(typedExpression1, expression2);
+                }
+                else
+                {
+                    return PredicateBuilder.And(typedExpression1, expression2);
+                }
+            }
+            else if (expression1 == null)
+            {
+                return expression2;
+            }
+            else
+            {
+                return typedExpression1;
+            }
         }
 
         #endregion
