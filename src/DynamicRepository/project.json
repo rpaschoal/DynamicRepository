@@ -4,20 +4,21 @@
   "description": "https://github.com/rpaschoal/DynamicRepository",
   "version": "1.0.0-*",
 
-  "dependencies": {    
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0-rc2-*"
-    }
-  },
-
   "frameworks": {
     "netstandard1.5": {
       "imports": [
         "dotnet5.6",
         "dnxcore50",
         "portable-net45+win8"
-      ]
-    }
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-rc2-*"
+        }
+      }
+
+    },
+    "net452": { }
   }
 }
