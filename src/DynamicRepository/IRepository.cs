@@ -1,6 +1,8 @@
 ﻿using DynamicRepository.Filter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace DynamicRepository
 {
@@ -43,10 +45,25 @@ namespace DynamicRepository
         void Delete(Entity entityToDelete);
 
         /// <summary>
+        /// Filter, order and join the current entity based on criterias supplied as parameters.
+        /// </summary>
+        /// <param name="filter">Expression which supplies all desired filters.</param>
+        /// <param name="orderBy">Projetion to order the result.</param>
+        /// <param name="includeProperties">
+        /// Navigation properties that should be included on this query result. 
+        /// Ignore this if you have lazy loading enabled.
+        /// </param>
+        /// <returns>Fullfilled collection based on the criteria.</returns>
+        IEnumerable<Entity> List(
+            Expression<Func<Entity, bool>> filter = null,
+            Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null,
+            params string[] includeProperties);
+
+        /// <summary>
         /// Returns a paged, filtered and sorted collection.
         /// </summary>
         /// <param name="settings">Settings model for the search.</param>
         /// <returns>Collection of filtered items result.</returns>
-        IList<Entity> GetPagedDataSource(PagedDataSourceSettings settings);
+        IEnumerable<Entity> GetPagedDataSource(PagedDataSourceSettings settings);
     }
 }

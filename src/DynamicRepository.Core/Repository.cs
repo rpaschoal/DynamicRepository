@@ -27,7 +27,7 @@ namespace DynamicRepository.Core
         /// <summary>
         /// DBSet of <see cref="Entity"/> extracted from <see cref="Context"/>.
         /// </summary>
-        internal DbSet<Entity> DbSet;
+        protected internal DbSet<Entity> DbSet;
 
         /// <summary>
         /// Default constructor of main repository. 
@@ -113,6 +113,48 @@ namespace DynamicRepository.Core
             }
         }
 
+        /// <summary>
+        /// Filter, order and join the current entity based on criterias supplied as parameters.
+        /// </summary>
+        /// <param name="filter">Expression which supplies all desired filters.</param>
+        /// <param name="orderBy">Projetion to order the result.</param>
+        /// <param name="includeProperties">
+        /// Navigation properties that should be included on this query result. 
+        /// Ignore this if you have lazy loading enabled. 
+        /// NOT SUPORTED ATM!
+        /// </param>
+        /// <returns>Fullfilled collection based on the criteria.</returns>
+        public IEnumerable<Entity> List(
+            Expression<Func<Entity, bool>> filter = null,
+            Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null,
+            params string[] includeProperties)
+        {
+            IQueryable<Entity> query = DbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            // TODO => Implement this when possible.
+            foreach (var includeProperty in includeProperties)
+            {
+                // EF Team still didn't add this feature.
+                // http://stackoverflow.com/questions/27634229/dbset-include-operator-for-ef7-accepting-string-path
+                throw new NotImplementedException();
+                //query = query.Include(includeProperty);
+            }
+
+            if (orderBy != null)
+            {
+                return orderBy(query).ToList();
+            }
+            else
+            {
+                return query.ToList();
+            }
+        }
+
         #region Paged Data Source Implemantation and Definitions
 
         /// <summary>
@@ -121,7 +163,7 @@ namespace DynamicRepository.Core
         /// <param name="settings">Settings for the search.</param>
         /// <param name="accountScoped">If true defines that the filter should apply only to current pipeline accountID. Defaults to TRUE.</param>
         /// <returns>Filled PagedDataSource instance.</returns>
-        public IList<Entity> GetPagedDataSource(PagedDataSourceSettings settings)
+        public IEnumerable<Entity> GetPagedDataSource(PagedDataSourceSettings settings)
         {
             try
             {
@@ -160,6 +202,7 @@ namespace DynamicRepository.Core
                     }
                 }
 
+                // Calling ToList to run the query on DB.
                 return pagedDataSourceQuery.AsExpandable().ToList();
             }
             catch (Exception ex)
