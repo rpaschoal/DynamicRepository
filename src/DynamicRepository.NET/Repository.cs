@@ -106,8 +106,11 @@ namespace DynamicRepository.NET
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
-            DbSet.Remove(entityToDelete);
-            Context.SaveChanges();
+            if (entityToDelete != null)
+            {
+                DbSet.Remove(entityToDelete);
+                Context.SaveChanges();
+            }
         }
 
         #region Paged Data Source Implemantation and Definitions

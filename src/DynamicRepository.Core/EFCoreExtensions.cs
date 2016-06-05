@@ -20,9 +20,9 @@ namespace DynamicRepository.Core
         /// <remarks>
         /// Credits: http://www.c-sharpcorner.com/blogs/dbsetfind-api-missing-in-entity-framework-core-final-rc1-version
         /// </remarks>
-        public static TEntity Find<TEntity>(this DbSet<TEntity> set, params object[] keyValues) where TEntity : class
+        public static TEntity Find<TEntity>(this DbSet<TEntity> set, DbContext context, params object[] keyValues) where TEntity : class
         {
-            var context = ((IInfrastructure<IServiceProvider>)set).GetService<DbContext>();
+            //var context = ((IInfrastructure<IServiceProvider>)set).GetService<DbContext>();
 
             var entityType = context.Model.FindEntityType(typeof(TEntity));
             var key = entityType.FindPrimaryKey();

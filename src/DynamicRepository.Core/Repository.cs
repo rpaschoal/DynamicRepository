@@ -62,11 +62,11 @@ namespace DynamicRepository.Core
             if (key is Array)
             {
                 // This is to handle entity framework find by composite key
-                return DbSet.Find((key as IEnumerable).Cast<object>().ToArray());
+                return DbSet.Find(Context, (key as IEnumerable).Cast<object>().ToArray());
             }
             else
             {
-                return DbSet.Find(key);
+                return DbSet.Find(Context, key);
             }
         }
 
@@ -106,8 +106,11 @@ namespace DynamicRepository.Core
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
-            DbSet.Remove(entityToDelete);
-            Context.SaveChanges();
+            if (entityToDelete != null)
+            {
+                DbSet.Remove(entityToDelete);
+                Context.SaveChanges();
+            }
         }
 
         #region Paged Data Source Implemantation and Definitions
