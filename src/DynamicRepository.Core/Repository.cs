@@ -283,7 +283,7 @@ namespace DynamicRepository.Core
         /// <returns>The string lambda expression.</returns>
         private Expression<Func<Entity, bool>> MergeFilters(PagedDataSourceSettings settings, string expression, bool isAllSearch = false)
         {
-            var expression1 = !String.IsNullOrEmpty(expression) ? System.Linq.Dynamic.Core.DynamicExpression.ParseLambda(false, typeof(Entity), typeof(bool), expression, null) : null;
+            var expression1 = !String.IsNullOrEmpty(expression) ? System.Linq.Dynamic.Core.DynamicExpression.ParseLambda(false, typeof(Entity), null, expression) : null;
             var expression2 = AddExtraPagedDataSourceFilter(settings);
 
             var typedExpression1 = (Expression<Func<Entity, bool>>) Expression.Lambda(expression1, null);

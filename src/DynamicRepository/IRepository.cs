@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DynamicRepository.Core
+namespace DynamicRepository
 {
     /// <summary>
     /// Default contract for repository pattern general data access methods.
