@@ -1,6 +1,6 @@
 # DynamicRepository
 
-Dynamic repository with general/common methods for repository pattern on ASP NET 5 projects using EF (Both Core and .NET CLR). 
+Dynamic repository with general/common methods for repository pattern on ASP NET 5 (RC2) projects using EF (Both Core and .NET CLR). 
 
 With this package you get full CRUD data access for your repository + advanced filtering methods with almost no additional code.
 
