@@ -24,6 +24,8 @@ MyEntityRepository.Delete(1);
 MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.Name);
 ```
 
+__Filters by data containing "Rafael", sorts by name property__
+
 ## Usage
 
 Follow the next steps to configure DynamicRepository on your ASP NET 5 project.
