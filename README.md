@@ -24,7 +24,17 @@ MyEntityRepository.Delete(1);
 MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.Name);
 ```
 
-__Filters by data containing "Rafael", sorts by name property__
+Filters by data containing "Rafael", sorts by name property
+
+### Paged filtering
+
+In most applications there is a need to filter paged-indexed collections (Useful for grids/lists). You can use it as following:
+
+```cs
+MyEntityRepository.GetPagedDataSource(settings);
+```
+
+Where "settings" is of "PagedDataSourceSettings" class. In this class you can define filters (+ conjunctions), sort, page and batch size.
 
 ## Usage
 
