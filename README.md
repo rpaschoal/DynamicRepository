@@ -6,9 +6,21 @@ With this package you get full CRUD data access for your repository + advanced f
 
 You can find the NuGet packages here: https://www.nuget.org/packages?q=DynamicRepository
 
+## Features
+
+### Full Crud Behavior
+
+```cs
+_accountsRepository.Insert(MyEntity);
+_accountsRepository.Get(1);
+_accountsRepository.Update(MyEntity);
+_accountsRepository.Delete(MyEntity);
+_accountsRepository.Delete(1);
+```
+
 ## Usage
 
-Follow the steps to configure DynamicRepository on your ASP NET 5 project.
+Follow the next steps to configure DynamicRepository on your ASP NET 5 project.
 
 ### Installing package
 
