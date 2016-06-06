@@ -21,7 +21,7 @@ MyEntityRepository.Delete(1);
 ### Filtering
 
 ```cs
-MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.Name);
+MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.OrderBy(y => y.Name));
 ```
 
 Filters by data containing "Rafael", sorts by name property
