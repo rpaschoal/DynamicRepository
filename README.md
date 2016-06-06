@@ -81,3 +81,13 @@ public interface IMyEntityRepository :  IRepository<int, MyEntity>
   /* Any additional methods definitions comes here */
 }
 ```
+
+## Dependencies
+
+This project was implemented on top of these dependencies:
+
+* https://github.com/kahanu/System.Linq.Dynamic
+* https://github.com/StefH/System.Linq.Dynamic.Core
+* https://github.com/scottksmith95/LINQKit
+
+Many thanks!
