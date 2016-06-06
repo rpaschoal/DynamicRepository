@@ -55,6 +55,11 @@ To leverage use of the package, just create a class for your entity repository (
 ```cs
 public class MyEntityRepository : Repository<int, MyEntity>
 {
+  // This is where you provide EF DB Context to "Repository" class. This should be your custom EF context. 
+  public MyEntityRepository(DbContext context) : base(context)
+  {
+  }
+
   /* Any specialized methods comes here */
 }
 ```
@@ -69,6 +74,12 @@ If you use interfaces to define your repositories, follow this approach:
 ```cs
 public class MyEntityRepository : Repository<int, MyEntity>, IMyEntityRepository
 {
+  // This is where you provide EF DB Context to "Repository" class. This should be your custom EF context.
+  // As you are using interfaces I may assume you are also using DI. You can set DbContext to be inject through DI.
+  public MyEntityRepository(DbContext context) : base(context)
+  {
+  }
+
   /* Any specialized methods comes here */
 }
 ```
