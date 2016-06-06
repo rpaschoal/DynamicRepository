@@ -6,3 +6,12 @@ You can find the NuGet packages here: https://www.nuget.org/packages?q=DynamicRe
 
 ## Usage
 
+Follow the steps to configure DynamicRepository on your ASP NET 5 project.
+
+### Installing package
+
+On your project.json file, add DynamicRepository to your package dependencies (Core if you are on CoreCLR, or .NET if you are on CLR).
+
+```cs
+"DynamicRepository.Core": "1.0.2-*"
+```
