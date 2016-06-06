@@ -11,11 +11,17 @@ You can find the NuGet packages here: https://www.nuget.org/packages?q=DynamicRe
 ### Full Crud Behavior
 
 ```cs
-_accountsRepository.Insert(MyEntity);
-_accountsRepository.Get(1);
-_accountsRepository.Update(MyEntity);
-_accountsRepository.Delete(MyEntity);
-_accountsRepository.Delete(1);
+MyEntityRepository.Insert(MyEntity);
+MyEntityRepository.Get(1);
+MyEntityRepository.Update(MyEntity);
+MyEntityRepository.Delete(MyEntity);
+MyEntityRepository.Delete(1);
+```
+
+### Filtering
+
+```cs
+MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.Name);
 ```
 
 ## Usage
