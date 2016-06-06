@@ -18,15 +18,36 @@ On your project.json file, add DynamicRepository to your package dependencies (C
 "DynamicRepository.Core": "1.0.2-*"
 ```
 
-### Usage
+### Implementation
 
 To leverage use of the package, just create a class for your entity repository (EG: MyEntityRepository.cs) and inherit from DynamicRepository.Core.Repository as following:
 
 ```cs
 public class MyEntityRepository : Repository<int, MyEntity>
 {
+  /* Any specialized methods comes here */
 }
 ```
 
 * The first type parameter is your database-entity key type. You can use a custom class type for composite primary keys or "object[]" if you prefer.
 * The second type paremeter should be your entity type class.
+
+### Implementation (With Contracts)
+
+If you use interfaces to define your repositories, follow this approach:
+
+```cs
+public class MyEntityRepository : Repository<int, MyEntity>, IMyEntityRepository
+{
+  /* Any specialized methods comes here */
+}
+```
+
+And on your interface define it as this:
+
+```cs
+public interface IMyEntityRepository :  IRepository<int, MyEntity>
+{
+  /* Any additional methods definitions comes here */
+}
+```
