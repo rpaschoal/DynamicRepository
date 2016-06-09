@@ -1,6 +1,6 @@
 # DynamicRepository
 
-Dynamic repository with general/common methods for repository pattern on ASP NET 5 projects using EF (Both Core and .NET CLR). 
+Dynamic repository with general/common methods for repository pattern on ASP NET 5 (RC2) projects using EF (Both Core and .NET CLR). 
 
 With this package you get full CRUD data access for your repository + advanced filtering methods with almost no additional code.
 
@@ -55,6 +55,11 @@ To leverage use of the package, just create a class for your entity repository (
 ```cs
 public class MyEntityRepository : Repository<int, MyEntity>
 {
+  // This is where you provide EF DB Context to "Repository" class. This should be your custom EF context. 
+  public MyEntityRepository(DbContext context) : base(context)
+  {
+  }
+
   /* Any specialized methods comes here */
 }
 ```
@@ -69,6 +74,12 @@ If you use interfaces to define your repositories, follow this approach:
 ```cs
 public class MyEntityRepository : Repository<int, MyEntity>, IMyEntityRepository
 {
+  // This is where you provide EF DB Context to "Repository" class. This should be your custom EF context.
+  // As you are using interfaces I may assume you are also using DI. You can set DbContext to be inject through DI.
+  public MyEntityRepository(DbContext context) : base(context)
+  {
+  }
+
   /* Any specialized methods comes here */
 }
 ```
@@ -81,3 +92,13 @@ public interface IMyEntityRepository :  IRepository<int, MyEntity>
   /* Any additional methods definitions comes here */
 }
 ```
+
+## Dependencies
+
+This project was implemented on top of these dependencies:
+
+* https://github.com/kahanu/System.Linq.Dynamic
+* https://github.com/StefH/System.Linq.Dynamic.Core
+* https://github.com/scottksmith95/LINQKit
+
+Many thanks!
