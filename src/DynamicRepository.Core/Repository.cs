@@ -163,7 +163,7 @@ namespace DynamicRepository.Core
         /// <param name="settings">Settings for the search.</param>
         /// <param name="accountScoped">If true defines that the filter should apply only to current pipeline accountID. Defaults to TRUE.</param>
         /// <returns>Filled PagedDataSource instance.</returns>
-        public IEnumerable<Entity> GetPagedDataSource(PagedDataSourceSettings settings)
+        public IPagedDataSourceResult<Entity> GetPagedDataSource(PagedDataSourceSettings settings)
         {
             try
             {
@@ -202,8 +202,11 @@ namespace DynamicRepository.Core
                     }
                 }
 
-                // Calling ToList to run the query on DB.
-                return pagedDataSourceQuery.AsExpandable().ToList();
+                // Shapes final paged result model.
+                return new PagedDataSourceResult<Entity>(pagedDataSourceQuery.AsExpandable().Count())
+                {
+                    Result = pagedDataSourceQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToList()
+                };
             }
             catch (Exception ex)
             {
@@ -332,7 +335,7 @@ namespace DynamicRepository.Core
             var expression1 = !String.IsNullOrEmpty(expression) ? System.Linq.Dynamic.Core.DynamicExpression.ParseLambda(false, typeof(Entity), null, expression) : null;
             var expression2 = AddExtraPagedDataSourceFilter(settings);
 
-            var typedExpression1 = (Expression<Func<Entity, bool>>) Expression.Lambda(expression1, null);
+            var typedExpression1 = (Expression<Func<Entity, bool>>)Expression.Lambda(expression1, null);
 
             if (expression1 == null && expression2 == null)
             {

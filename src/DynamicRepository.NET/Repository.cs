@@ -158,7 +158,7 @@ namespace DynamicRepository.NET
         /// <param name="settings">Settings for the search.</param>
         /// <param name="accountScoped">If true defines that the filter should apply only to current pipeline accountID. Defaults to TRUE.</param>
         /// <returns>Filled PagedDataSource instance.</returns>
-        public IEnumerable<Entity> GetPagedDataSource(PagedDataSourceSettings settings)
+        public IPagedDataSourceResult<Entity> GetPagedDataSource(PagedDataSourceSettings settings)
         {
             try
             {
@@ -197,8 +197,11 @@ namespace DynamicRepository.NET
                     }
                 }
 
-                // Calling ToList to hit the DB.
-                return pagedDataSourceQuery.AsExpandable().ToList();
+                // Shapes final paged result model.
+                return new PagedDataSourceResult<Entity>(pagedDataSourceQuery.AsExpandable().Count())
+                {
+                    Result = pagedDataSourceQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToList()
+                };
             }
             catch (Exception ex)
             {
@@ -222,7 +225,7 @@ namespace DynamicRepository.NET
 
             if (settings.Filter != null)
             {
-                foreach (var pFilter in settings.Filter)
+                foreach (var pFilter in settings.Filter.Where(x => !String.IsNullOrEmpty(x.Property) && !String.IsNullOrEmpty(x.Value)))
                 {
                     // Means we found that property in the entity model. Otherwise we should ignore or face with an Exception from IQueryable.
                     // We are also checking to see if we are not querying directly to the collection holder.

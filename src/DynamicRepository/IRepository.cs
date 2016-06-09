@@ -64,6 +64,6 @@ namespace DynamicRepository
         /// </summary>
         /// <param name="settings">Settings model for the search.</param>
         /// <returns>Collection of filtered items result.</returns>
-        IEnumerable<Entity> GetPagedDataSource(PagedDataSourceSettings settings);
+        IPagedDataSourceResult<Entity> GetPagedDataSource(PagedDataSourceSettings settings);
     }
 }
