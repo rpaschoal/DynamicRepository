@@ -155,6 +155,17 @@ namespace DynamicRepository.Core
             }
         }
 
+        /// <summary>
+        /// Returns <see cref="IQueryable"/> for consumers to shape queries as they need to.
+        /// </summary>
+        /// <returns>
+        /// Plain DbSet as Queryable.
+        /// </returns>
+        protected internal IQueryable<Entity> AsQueryable()
+        {
+            return DbSet.AsQueryable();
+        }
+
         #region Paged Data Source Implemantation and Definitions
 
         /// <summary>
