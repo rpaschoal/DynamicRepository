@@ -11,19 +11,19 @@ namespace DynamicRepository.Filter
     public class PagedDataSourceSettings
     {
         /// <summary>
-        /// When the <see cref="PropertyFilter"/> has this value, means it should be searched in all fields.
+        /// When the <see cref="FilterSettings"/> has this value, means it should be searched in all fields.
         /// </summary>
         public const string FILTERALLIDENTIFIER = "ALL";
 
         /// <summary>
         /// Desired filters to be applied to database.
         /// </summary>
-        public IList<PropertyFilter> Filter { get; set; } = new List<PropertyFilter>();
+        public IList<FilterSettings> Filter { get; set; } = new List<FilterSettings>();
 
         /// <summary>
-        /// Desired ordering of the data.
+        /// Desired sorting order of the data.
         /// </summary>
-        public Dictionary<string, SortOrderEnum> Order { get; set; } = new Dictionary<string, SortOrderEnum>();
+        public IList<SortingSettings> Order { get; set; } = new List<SortingSettings>();
 
         /// <summary> 
         /// Page index. Default is 1.

@@ -188,9 +188,11 @@ namespace DynamicRepository.NET
                 // Generates the order clause based on supplied parameters
                 if (settings.Order != null && settings.Order.Count > 0)
                 {
-                    foreach (var o in settings.Order)
+                    var distinctOrderSettings = settings.Order.Where(x => !String.IsNullOrEmpty(x.Property)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
+
+                    foreach (var o in distinctOrderSettings)
                     {
-                        pagedDataSourceQuery = pagedDataSourceQuery.OrderBy(o.Key + " " + o.Value.ToString());
+                        pagedDataSourceQuery = pagedDataSourceQuery.OrderBy(o.Property + " " + o.Order.ToString());
                     }
                 }
                 else
@@ -236,7 +238,9 @@ namespace DynamicRepository.NET
 
             if (settings.Filter != null)
             {
-                foreach (var pFilter in settings.Filter.Where(x => !String.IsNullOrEmpty(x.Property) && !String.IsNullOrEmpty(x.Value)))
+                var distinctFilters = settings.Filter.Where(x => !String.IsNullOrEmpty(x.Property) && !String.IsNullOrEmpty(x.Value)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
+
+                foreach (var pFilter in distinctFilters)
                 {
                     // Means we found that property in the entity model. Otherwise we should ignore or face with an Exception from IQueryable.
                     // We are also checking to see if we are not querying directly to the collection holder.

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DynamicRepository.Filter
 {
-    public class PropertyFilter
+    public class FilterSettings
     {
         /// <summary>
         /// The property to be filtered.
