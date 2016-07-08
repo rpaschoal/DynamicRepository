@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace DynamicRepository.Core
+namespace DynamicRepository.EFCore
 {
     /// <summary>
     /// Extension methods to add behavios which EF Core still haven't implemented on its official API.

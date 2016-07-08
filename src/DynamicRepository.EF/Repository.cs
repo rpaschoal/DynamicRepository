@@ -11,7 +11,7 @@ using DynamicRepository.Extensions;
 using System.Data.Entity;
 using System.Linq.Dynamic.Core;
 
-namespace DynamicRepository.NET
+namespace DynamicRepository.EF
 {
     /// <summary>
     /// Base repository for persistency model CRUD and advanced filtering operations.

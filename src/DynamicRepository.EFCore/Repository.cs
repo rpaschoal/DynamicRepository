@@ -10,7 +10,7 @@ using DynamicRepository.Filter;
 using LinqKit.Core;
 using DynamicRepository.Extensions;
 
-namespace DynamicRepository.Core
+namespace DynamicRepository.EFCore
 {
     /// <summary>
     /// Base repository for persistency model CRUD and advanced filtering operations.
