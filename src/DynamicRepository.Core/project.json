@@ -2,20 +2,19 @@
   "title": "DynamicRepository for ASP NET Core",
   "copyright": "Rafael Carvalho",
   "description": "https://github.com/rpaschoal/DynamicRepository",
-  "version": "1.0.3-*",
+  "version": "1.0.4-*",
 
   "dependencies": {
     "LinqKit.Core": "1.0.1",
-    "System.Linq.Dynamic.Core": "1.0.3.2",
-    "DynamicRepository": "1.0.3-*",
-    "NETStandard.Library": "1.5.0-rc2-24027"
+    "System.Linq.Dynamic.Core": "1.0.3.4",
+    "DynamicRepository": "1.0.4-*",
+    "NETStandard.Library": "1.6.0-rc3-24210-10",
   },
 
   "frameworks": {
-    "netstandard1.5": {
+    "netcoreapp1.0": {
       "imports": [
         "dotnet5.6",
-        "dnxcore50",
         "portable-net45+win8"
       ]
     }

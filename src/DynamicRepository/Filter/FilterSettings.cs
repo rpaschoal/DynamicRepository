@@ -24,6 +24,11 @@ namespace DynamicRepository.Filter
         public bool IsExactMatch { get; set; }
 
         /// <summary>
+        /// Sorting/filter settings will be applied in memory after database execution.
+        /// </summary>
+        public string PostQueryFilterPath { get; set; }
+
+        /// <summary>
         /// How this is aggregated to the filter.
         /// </summary>
         /// <remarks>

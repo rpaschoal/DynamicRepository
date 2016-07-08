@@ -4,8 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
-namespace DynamicRepository.Reflection
+namespace DynamicRepository.Extensions
 {
     /// <summary>
     /// Reflection helper class.
@@ -37,10 +38,10 @@ namespace DynamicRepository.Reflection
             return obj;
         }
 
-        public static void SetPropValue(this Object obj, String propName, object value)
+        public static void SetPropValue(this Object obj, String propName, object value, bool setUnsafe = false)
         {
             string[] nameParts = propName.Split('.');
-            if (nameParts.Length == 1)
+            if (nameParts.Length == 1 && !setUnsafe)
             {
                 return;
             }
@@ -57,8 +58,17 @@ namespace DynamicRepository.Reflection
                 if (info.Name == nameParts[nameParts.Length - 1])
                 {
                     Type t = Nullable.GetUnderlyingType(info.PropertyType) ?? info.PropertyType;
-                    object safeValue = (value == null) ? null : Convert.ChangeType(value, t);
-                    info.SetValue(obj, safeValue, null);
+
+                    if (!setUnsafe)
+                    {
+                        object safeValue = (value == null) ? null : Convert.ChangeType(value, t);
+                        info.SetValue(obj, safeValue, null);
+                    }
+                    else
+                    {
+                        info.SetValue(obj, value, null);
+                    }
+
                 }
                 else
                 {
@@ -160,6 +170,24 @@ namespace DynamicRepository.Reflection
                 return member.Member.Name;
 
             throw new ArgumentException("Expression is not a member access", "expression");
+        }
+
+        /// <summary>
+        /// Replaces the value of a collection property within an object based on an EF Dynamic Query.
+        /// </summary>
+        public static void ReplaceCollectionInstance(this object instanceHolder, string collectionPath, string query)
+        {
+            if (!String.IsNullOrEmpty(query))
+            {
+                // Gets the property reference
+                var collectionProp = instanceHolder.GetPropValue(collectionPath);
+
+                // Applies filter to the nested collection within the main entity.
+                collectionProp = ((System.Collections.IList)collectionProp).AsQueryable().Where(query);
+
+                // Filter in memory data here
+                instanceHolder.SetPropValue(collectionPath, collectionProp, true);
+            }
         }
     }
 }
