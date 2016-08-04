@@ -19,6 +19,7 @@
     "net452": {}
   },
   "dependencies": {
-    "System.Linq.Dynamic.Core": "1.0.3.4"
+    "System.Linq.Dynamic.Core": "1.0.3.4",
+    "LinqKit.Core": "1.0.1"
   }
 }
