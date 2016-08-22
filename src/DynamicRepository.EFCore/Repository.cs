@@ -19,7 +19,7 @@ namespace DynamicRepository.EFCore
     /// <typeparam name="Entity">The type of the entity being persisted or retrieved.</typeparam>
     public abstract class Repository<Key, Entity> : IRepository<Key, Entity> where Entity : class, new()
     {
-        private DataSourcePager<Key, Entity> _dataSourcePager;
+        private DataPager<Key, Entity> _dataSourcePager;
 
         /// <summary>
         /// Current EF DBContext instance.
@@ -44,7 +44,7 @@ namespace DynamicRepository.EFCore
             // Configures current entity DB Set which is being manipulated
             DbSet = context.Set<Entity>();
 
-            _dataSourcePager = new DataSourcePager<Key, Entity>();
+            _dataSourcePager = new DataPager<Key, Entity>();
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace DynamicRepository
     /// </summary>
     /// <typeparam name="Key">The type of the key of the Entity.</typeparam>
     /// <typeparam name="Entity">The Entity being paged.</typeparam>
-    public class DataSourcePager<Key, Entity> where Entity : class, new()
+    public class DataPager<Key, Entity> where Entity : class, new()
     {
         /// <summary>
         /// TODO: Change this to be a plugin setting.
@@ -466,7 +466,7 @@ namespace DynamicRepository
         /// <param name="propertyPath">The property by dot notation path. Eg: Legs.Aircraft</param>
         /// <param name="collectionPathTotal">The number of collections found in depth on this path.</param>
         /// <returns>Reflection time property information.</returns>
-        private PropertyInfo GetValidatedPropertyInfo(string propertyPath, out int collectionPathTotal)
+        protected internal PropertyInfo GetValidatedPropertyInfo(string propertyPath, out int collectionPathTotal)
         {
             // Means we found that property in the entity model. Otherwise we should ignore or face with an Exception from IQueryable.
             // We are also checking to see if we are not querying directly to the collection holder.
