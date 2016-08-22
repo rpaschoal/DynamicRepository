@@ -9,9 +9,9 @@ namespace DynamicRepository.Mapping
     /// Use this on API endpoint or MVC controller to configure default sorting property for paged data source results.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public sealed class PagedDataSourceDefaultSortingAttribute : Attribute
+    public sealed class PagedDataDefaultSortingAttribute : Attribute
     {
-        public PagedDataSourceDefaultSortingAttribute(string property, bool isAscending = false)
+        public PagedDataDefaultSortingAttribute(string property, bool isAscending = false)
         {
             this.Property = property;
             this.IsAscending = isAscending;

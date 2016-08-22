@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace DynamicRepository
 {
-    public class PagedDataSourceResult<Entity> : IPagedDataSourceResult<Entity> where Entity : class
+    public class PagedDataResult<Entity> : IPagedDataResult<Entity> where Entity : class
     {
-        public PagedDataSourceResult(int totalRecords)
+        public PagedDataResult(int totalRecords)
         {
             this.TotalRecords = totalRecords;
         }

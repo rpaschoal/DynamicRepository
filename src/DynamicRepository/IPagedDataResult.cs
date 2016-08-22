@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 namespace DynamicRepository
 {
     /// <summary>
-    /// Response model for <see cref="DynamicRepository.IRepository{Key, Entity}.GetPagedDataSource(Filter.PagedDataSourceSettings)"/>.
+    /// Response model for <see cref="DynamicRepository.IRepository{Key, Entity}.GetPagedData(Filter.PagedDataSettings)(Filter.PagedDataSettings)"/>.
     /// </summary>
     /// <typeparam name="Entity">Entity model type. This is your DbContext or POCO entity type.</typeparam>
-    public interface IPagedDataSourceResult<Entity> where Entity : class
+    public interface IPagedDataResult<Entity> where Entity : class
     {
         /// <summary>
         /// Identifies how many records in paged data source query regardless of current page and page size.

@@ -31,42 +31,42 @@ namespace DynamicRepository
         /// </summary>
         /// <param name="queryableToPage">IQueryable instance of <see cref="Entity"/> which will act as data source for the pagination.</param>
         /// <param name="settings">Settings for the search.</param>
-        /// <param name="PreConditionsToPagedDataSourceFilter">Pre condition Expression Filters.</param>
-        /// <param name="ExtraPagedDataSourceFilter">Extra conditions Expression Filters to be applied along with settings filters.</param>
-        /// <returns>Filled PagedDataSource instance.</returns>
-        public IPagedDataSourceResult<Entity> GetPagedDataSource(IQueryable<Entity> queryableToPage,
-                                                                 PagedDataSourceSettings settings,
-                                                                 Expression<Func<Entity, bool>> PreConditionsToPagedDataSourceFilter = null,
-                                                                 Expression<Func<Entity, bool>> ExtraPagedDataSourceFilter = null)
+        /// <param name="PreConditionsToPagedDataFilter">Pre condition Expression Filters.</param>
+        /// <param name="ExtraPagedDataFilter">Extra conditions Expression Filters to be applied along with settings filters.</param>
+        /// <returns>Filled PageData results instance.</returns>
+        public IPagedDataResult<Entity> GetPagedData(IQueryable<Entity> queryableToPage,
+                                                                 PagedDataSettings settings,
+                                                                 Expression<Func<Entity, bool>> PreConditionsToPagedDataFilter = null,
+                                                                 Expression<Func<Entity, bool>> ExtraPagedDataFilter = null)
         {
             try
             {
-                IQueryable<Entity> pagedDataSourceQuery = queryableToPage;
+                IQueryable<Entity> pagedDataQuery = queryableToPage;
 
-                // Applies pre conditioning filtering to the data source. (This is a pre-filter that executes before the filters instructed by PagedDataSourceSettings).
-                if (PreConditionsToPagedDataSourceFilter != null)
+                // Applies pre conditioning filtering to the data source. (This is a pre-filter that executes before the filters instructed by PagedDataSettings).
+                if (PreConditionsToPagedDataFilter != null)
                 {
-                    pagedDataSourceQuery = pagedDataSourceQuery.Where(PreConditionsToPagedDataSourceFilter);
+                    pagedDataQuery = pagedDataQuery.Where(PreConditionsToPagedDataFilter);
                 }
 
                 // Adds composed filter to the query here (This is the default filter inspector bult-in for the search).
-                // This is a merge result from default query engine + customized queries from devs (AddExtraPagedDataSourceFilter method).
-                pagedDataSourceQuery = pagedDataSourceQuery.Where(MergeFilters(settings, DefaultPagedDataSourceFilter(settings), ExtraPagedDataSourceFilter, settings.SearchInALL));
+                // This is a merge result from default query engine + customized queries from devs (AddExtraPagedDataFilter method).
+                pagedDataQuery = pagedDataQuery.Where(MergeFilters(settings, DefaultPagedDataFilter(settings), ExtraPagedDataFilter, settings.SearchInALL));
 
                 // Adds sorting capabilities
-                pagedDataSourceQuery = this.AddSorting(pagedDataSourceQuery, settings);
+                pagedDataQuery = this.AddSorting(pagedDataQuery, settings);
 
                 // Total number of records regardless of paging.
-                var totalRecordsInDB = pagedDataSourceQuery.AsExpandable().Count();
+                var totalRecordsInDB = pagedDataQuery.AsExpandable().Count();
 
                 // Shapes final result model
-                return new PagedDataSourceResult<Entity>(pagedDataSourceQuery.AsExpandable().Count())
+                return new PagedDataResult<Entity>(pagedDataQuery.AsExpandable().Count())
                 {
-                    Result = pagedDataSourceQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToList()
+                    Result = pagedDataQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToList()
                 };
 
                 // TODO: Make in memory callback work on later time.
-                //return pagedDataSourceQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToWrapperPaged(totalRecordsInDB, (p) => InMemoryOperationsCallback(p, settings));
+                //return pagedDataQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToWrapperPaged(totalRecordsInDB, (p) => InMemoryOperationsCallback(p, settings));
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace DynamicRepository
         }
 
         /// <summary>
-        /// Adds default filter mechanism to GetPagedDataSource method.
+        /// Adds default filter mechanism to GetPagedData method.
         /// </summary>
         /// <remarks>
         /// This method allows multi-navigation property filter as long as they are not collections.
@@ -83,7 +83,7 @@ namespace DynamicRepository
         /// </remarks>
         /// <param name="settings">Current filter settings supplied by the consumer.</param>
         /// <returns>Expression to be embedded to the IQueryable filter instance.</returns>
-        protected virtual Expression<Func<Entity, bool>> DefaultPagedDataSourceFilter(PagedDataSourceSettings settings)
+        protected virtual Expression<Func<Entity, bool>> DefaultPagedDataFilter(PagedDataSettings settings)
         {
             bool firstExecution = true;
             var queryLinq = string.Empty;
@@ -179,7 +179,7 @@ namespace DynamicRepository
         }
 
         /// <summary>
-        /// Adds default sorting mechanism to GetPagedDataSource method.
+        /// Adds default sorting mechanism to GetPagedData method.
         /// </summary>
         /// <remarks>
         /// This method allows multi-navigation property filter as long as they are not collections.
@@ -189,7 +189,7 @@ namespace DynamicRepository
         /// </remarks>
         /// <param name="settings">Current sorting settings supplied by the consumer.</param>
         /// <returns>Expression to be embedded to the IQueryable instance.</returns>
-        private IQueryable<Entity> AddSorting(IQueryable<Entity> pagedDataSourceQuery, PagedDataSourceSettings settings)
+        private IQueryable<Entity> AddSorting(IQueryable<Entity> pagedDataQuery, PagedDataSettings settings)
         {
             bool noFilterApplied = true;
 
@@ -226,7 +226,7 @@ namespace DynamicRepository
                 if (!noFilterApplied)
                 {
                     bufferedSortByClause = bufferedSortByClause.Substring(0, bufferedSortByClause.Length - 1); // Removes last comma
-                    pagedDataSourceQuery = pagedDataSourceQuery.OrderBy(bufferedSortByClause);
+                    pagedDataQuery = pagedDataQuery.OrderBy(bufferedSortByClause);
                 }
             }
 
@@ -238,7 +238,7 @@ namespace DynamicRepository
                 if (propCollection.Count() > 0)
                 {
                     var firstFieldOfEntity = propCollection[0].Name;
-                    pagedDataSourceQuery = pagedDataSourceQuery.OrderBy(firstFieldOfEntity + " " + SortOrderEnum.DESC.ToString());
+                    pagedDataQuery = pagedDataQuery.OrderBy(firstFieldOfEntity + " " + SortOrderEnum.DESC.ToString());
                 }
                 else
                 {
@@ -246,7 +246,7 @@ namespace DynamicRepository
                 }
             }
 
-            return pagedDataSourceQuery;
+            return pagedDataQuery;
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace DynamicRepository
         /// </summary>
         /// <param name="query">The IQueryable instance to be parsed.</param>
         /// <returns>The string lambda expression.</returns>
-        private Expression<Func<Entity, bool>> MergeFilters(PagedDataSourceSettings settings,
+        private Expression<Func<Entity, bool>> MergeFilters(PagedDataSettings settings,
             Expression<Func<Entity, bool>> expressionLeft,
             Expression<Func<Entity, bool>> expressionRight,
             bool isAllSearch = false)
@@ -290,7 +290,7 @@ namespace DynamicRepository
         /// <remarks>
         /// This method is useful for children collection filter. The only way to accomplish through LINQ.
         /// </remarks>
-        private IList PostQueryCallbacksInvoker(IList fetchedResult, PagedDataSourceSettings settings)
+        private IList PostQueryCallbacksInvoker(IList fetchedResult, PagedDataSettings settings)
         {
             fetchedResult = this.PostQueryFilter(fetchedResult, settings);
             fetchedResult = this.PostQuerySort(fetchedResult, settings);
@@ -305,7 +305,7 @@ namespace DynamicRepository
         /// <param name="fetchedResult">This is the return from EF query after going to DB.</param>
         /// <param name="settings">Paged data source settings.</param>
         /// <returns>Filtered collection result.</returns>
-        private IList PostQueryFilter(IList fetchedResult, PagedDataSourceSettings settings)
+        private IList PostQueryFilter(IList fetchedResult, PagedDataSettings settings)
         {
             if (settings.Filter != null && settings.Filter.Count > 0 && !settings.SearchInALL)
             {
@@ -413,7 +413,7 @@ namespace DynamicRepository
         /// <param name="fetchedResult">This is the return from EF query after going to DB.</param>
         /// <param name="settings">Paged data source settings.</param>
         /// <returns>Sorted collection result.</returns>
-        private IList PostQuerySort(IList fetchedResult, PagedDataSourceSettings settings)
+        private IList PostQuerySort(IList fetchedResult, PagedDataSettings settings)
         {
             // Generates the order clause based on supplied parameters
             if (settings.Order != null && settings.Order.Count > 0)
@@ -474,7 +474,7 @@ namespace DynamicRepository
 
             if (collectionPathTotal > 1)
             {
-                throw new Exception($"{nameof(this.GetPagedDataSource)} method does not support more than one nested collection depth filter. Please try using ExtraPagedDataSourceFilters for more advanced queries.");
+                throw new Exception($"{nameof(this.GetPagedData)} method does not support more than one nested collection depth filter. Please try using ExtraPagedDataFilters for more advanced queries.");
             }
             else if (collectionPathTotal == 1)
             {
@@ -484,7 +484,7 @@ namespace DynamicRepository
                 if (firstLevelPropInfo == typeof(string) || !typeof(IEnumerable).IsAssignableFrom(firstLevelPropInfo))
                 {
                     // Seriously, this is too much innovation if it happens.
-                    throw new Exception($"{nameof(this.GetPagedDataSource)} method does not support to filter in collections which are not in the first level of depth. . Please try using ExtraPagedDataSourceFilters for more advanced queries.");
+                    throw new Exception($"{nameof(this.GetPagedData)} method does not support to filter in collections which are not in the first level of depth. . Please try using ExtraPagedDataFilters for more advanced queries.");
                 }
             }
 

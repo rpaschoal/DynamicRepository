@@ -8,7 +8,7 @@ namespace DynamicRepository.Filter
     /// <summary>
     /// Filter, sorting and paging settings for advanced searchs.
     /// </summary>
-    public class PagedDataSourceSettings
+    public class PagedDataSettings
     {
         /// <summary>
         /// When the <see cref="FilterSettings"/> has this value, means it should be searched in all fields.

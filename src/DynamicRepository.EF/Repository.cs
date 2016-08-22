@@ -170,14 +170,14 @@ namespace DynamicRepository.EF
         /// Returns a collection of data results that can be paged.
         /// </summary>
         /// <param name="settings">Settings for the search.</param>
-        /// <returns>Filled PagedDataSource instance.</returns>
-        public IPagedDataSourceResult<Entity> GetPagedDataSource(PagedDataSourceSettings settings)
+        /// <returns>Filled PagedData instance.</returns>
+        public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataSourcePager.GetPagedDataSource((IQueryable<Entity>)this.List(), settings, this.AddPreConditionsPagedDataSourceFilter(settings), this.AddExtraPagedDataSourceFilter(settings));
+            return _dataSourcePager.GetPagedData((IQueryable<Entity>)this.List(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
         }
 
         /// <summary>
-        /// Adds extra filter to PagedDataSource method.
+        /// Adds extra filter to PagedData method.
         /// </summary>
         /// <remarks>
         /// Override this method in <see cref="Repository{Key, Entity}{Key, Entity}"/> implementation 
@@ -185,7 +185,7 @@ namespace DynamicRepository.EF
         /// </remarks>
         /// <param name="settings">Current filter settings supplied by the consumer.</param>
         /// <returns>Expression to be embedded to the IQueryable filter instance.</returns>
-        protected virtual Expression<Func<Entity, bool>> AddExtraPagedDataSourceFilter(PagedDataSourceSettings settings)
+        protected virtual Expression<Func<Entity, bool>> AddExtraPagedDataFilter(PagedDataSettings settings)
         {
             // Needs to be overriden by devs to add behavior to this. 
             // Change the injected filter on concrete repositories.
@@ -202,7 +202,7 @@ namespace DynamicRepository.EF
         /// </remarks>
         /// <param name="settings">Current filter settings supplied by the consumer.</param>
         /// <returns>Expression to be embedded to the IQueryable filter instance.</returns>
-        protected virtual Expression<Func<Entity, bool>> AddPreConditionsPagedDataSourceFilter(PagedDataSourceSettings settings)
+        protected virtual Expression<Func<Entity, bool>> AddPreConditionsPagedDataFilter(PagedDataSettings settings)
         {
             // Needs to be overriden by devs to add behavior to this.
             return null;
