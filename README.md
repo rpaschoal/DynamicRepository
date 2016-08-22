@@ -1,6 +1,6 @@
 # DynamicRepository
 
-Dynamic repository with general/common methods for repository pattern on ASP NET Core projects using EF (Both Core and .NET CLR). 
+Dynamic repository with general/common methods for repository pattern on ASP NET Core projects for EF6 (CoreCLR), EF Core and MongoDB. 
 
 With this package you get full CRUD data access for your repository + advanced filtering methods with almost no additional code.
 
