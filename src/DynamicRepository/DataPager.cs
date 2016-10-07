@@ -353,15 +353,16 @@ namespace DynamicRepository
                                 // Tests if the current property to be filtered is NULLABLE in order to add ".Value" to string lambda query.
                                 var nullableValueOperator = string.Empty;
                                 var pipeProperty = pipe.Remove(0, navigationPropertyCollection.Length + 1); // Clean pipe without collection prefix.
-                                // Nullable subproperty field.
-                                if (Nullable.GetUnderlyingType(result.GetNestedPropInfo(pipe).PropertyType) != null)
-                                {
-                                    nullableValueOperator = ".Value";
-                                }
 
                                 // Apparently String implements IEnumerable, since it is a collection of chars
                                 if (propInfo != null && (propInfo.PropertyType != typeof(string) || typeof(IEnumerable).IsAssignableFrom(propInfo.PropertyType)))
                                 {
+                                    // Nullable subproperty field.
+                                    if (Nullable.GetUnderlyingType(result.GetNestedPropInfo(pipe).PropertyType) != null)
+                                    {
+                                        nullableValueOperator = ".Value";
+                                    }
+
                                     // Sub collection filter LINQ
                                     // Applies filter do DateTime properties
                                     if (result.GetNestedPropInfo(pipe).PropertyType.IsAssignableFrom(typeof(DateTime)))
