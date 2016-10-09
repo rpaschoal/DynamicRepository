@@ -42,5 +42,69 @@ namespace DynamicRepository.Tests
             Assert.True(result.TotalRecords == items.Count, "Total records in the paged result does not match the total in the fixture collection.");
             Assert.True(result.Result.Count == pagedSize, "Total items in first paged batch does not match the configured page size.");
         }
+
+        /// <summary>
+        /// Evaluates if data can be filtered by exact match over an IQueryable instance.
+        /// </summary>
+        [Fact]
+        public void CanFilterPagedDataWithExactMatch()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+            var expectedResults = 1;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Filter.Add(new FilterSettings()
+            {
+                Property =  "Label",
+                Value = items.Last().Label,
+                IsExactMatch = true
+                
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.TotalRecords == expectedResults, "Results differ of what they should be. Possibly the filter on the DataPager class is not working.");
+            Assert.True(result.Result.Count == expectedResults, "Returned results differ than total records.");
+        }
+
+        /// <summary>
+        /// Evaluates if data can be filtered by partial match over an IQueryable instance.
+        /// </summary>
+        [Fact]
+        public void CanFilterPagedDataWithPartialMatch()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+            var expectedResults = items.Count - 1;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Filter.Add(new FilterSettings()
+            {
+                Property = "Label",
+                Value = "Label",
+                IsExactMatch = false
+
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.TotalRecords == expectedResults, "Results differ of what they should be. Possibly the filter on the DataPager class is not working.");
+            Assert.True(result.Result.Count == pagedSize, "Total items in first paged batch does not match the configured page size.");
+        }
     }
 }

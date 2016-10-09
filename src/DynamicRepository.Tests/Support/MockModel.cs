@@ -73,7 +73,7 @@ namespace DynamicRepository.Tests.Support
                 new MockModel()
                 {
                     Id = 1,
-                    Label = "Nineth Label"
+                    Label = "Nineth" // Leaving this without label for filter tests.
                 }
             };
         }
