@@ -106,5 +106,63 @@ namespace DynamicRepository.Tests
             Assert.True(result.TotalRecords == expectedResults, "Results differ of what they should be. Possibly the filter on the DataPager class is not working.");
             Assert.True(result.Result.Count == pagedSize, "Total items in first paged batch does not match the configured page size.");
         }
+
+        /// <summary>
+        /// Evaluates if data can be sorted over an IQueryable instance.
+        /// </summary>
+        [Fact]
+        public void CanSortPagedData()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Order.Add(new SortingSettings()
+            {
+                Property = "Label",
+                // Order =  SortOrderEnum.ASC // Should default to ASC
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.Result.First().Label == "Eigth Label");
+            Assert.True(result.Result.Last().Label == "Nineth");
+        }
+
+        /// <summary>
+        /// Evaluates if data can be sorted by descending data over an IQueryable instance.
+        /// </summary>
+        [Fact]
+        public void CanSortPagedDataByDescending()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Order.Add(new SortingSettings()
+            {
+                Property = "Label",
+                Order =  SortOrderEnum.DESC // Should default to ASC
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.Result.First().Label == "Third Label");
+            Assert.True(result.Result.Last().Label == "Nineth");
+        }
     }
 }
