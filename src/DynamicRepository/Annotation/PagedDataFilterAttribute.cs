@@ -19,14 +19,14 @@ namespace DynamicRepository.Annotation
     /// [PagedDataSourceAdapter("Id", "MyEntityIdProperty")]
     /// </example>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    public sealed class DataPagerFilterAttribute : Attribute
+    public sealed class PagedDataFilterAttribute : Attribute
     {
-        public DataPagerFilterAttribute(string mapsFrom, string mapsTo, string postFilterPath = "", string inMemoryFilterExplict = "")
+        public PagedDataFilterAttribute(string mapsFrom, string mapsTo, string postQueryFilterPath = "", string postQueryFilterPathExplict = "")
         {
             this.MapsFrom = mapsFrom;
             this.MapsTo = mapsTo;
-            this.PostFilterPath = postFilterPath;
-            this.PostFilterExplict = PostFilterExplict;
+            this.PostQueryFilterPath = postQueryFilterPath;
+            this.PostQueryFilterPathExplict = postQueryFilterPathExplict;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace DynamicRepository.Annotation
         /// <remarks>
         /// This property applies both Sorting AND Filtering based on its value.
         /// </remarks>
-        public string PostFilterPath { get; set; }
+        public string PostQueryFilterPath { get; set; }
 
         /// <summary>
         /// Applies post query hit filtering to a resulting collection of a LINQ query.
@@ -65,7 +65,7 @@ namespace DynamicRepository.Annotation
         /// 
         /// * If this is left as the class default value (String.Empty), filtering and sorting will be applied based on <see cref="PostFilterPath"/>.  
         /// </remarks>
-        public string PostFilterExplict { get; set; }
+        public string PostQueryFilterPathExplict { get; set; }
 
         /// <summary>
         /// When set to true, this attribute values won't be applied for filtering.
