@@ -127,7 +127,7 @@ The "PagedDataSettings" defines the payload for the Advanced Search Engine. Foll
 * "Property" Property: This is the name of the property in your Entity class where you want the "OrderBy" expression to be applied.
 * "Order" Property: This is the data sorting order you want to be applied in this "OrderBy" expression. Default is Ascending.
 
-#### Oh no! I have a very unique scenario and I think this search won't fit me!
+#### Oh no! I have a very unique scenario and I think this search won't be useful to me!
 
 Don't worry about it if you are questioning this to yourself. If for any reason the default filtering mechanism does not fit your requirement you can use the one of the following:
 
