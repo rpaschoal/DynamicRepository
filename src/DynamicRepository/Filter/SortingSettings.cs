@@ -16,16 +16,16 @@ namespace DynamicRepository.Filter
         public string Property { get; set; }
 
         /// <summary>
-        /// This sorting settings will be applied in memory after hitting database.
-        /// </summary>
-        internal string PostQuerySortingPath { get; set; }
-
-        /// <summary>
         /// The order which you want to apply to this sort property.
         /// Available values are:
         /// * <see cref="SortOrderEnum.ASC"/>
         /// * <see cref="SortOrderEnum.DESC"/>
         /// </summary>
         public SortOrderEnum Order { get; set; }
+
+        /// <summary>
+        /// This sorting settings will be applied in memory after hitting database.
+        /// </summary>
+        internal string PostQuerySortingPath { get; set; }
     }
 }

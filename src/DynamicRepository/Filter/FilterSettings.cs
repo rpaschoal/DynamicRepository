@@ -24,16 +24,13 @@ namespace DynamicRepository.Filter
         public bool IsExactMatch { get; set; }
 
         /// <summary>
+        /// How this filter is aggregated among to other existing filters. Defaults to "AND" conjunction.
+        /// </summary>
+        public LogicalConjunctionEnum Conjunction { get; set; } = LogicalConjunctionEnum.AND;
+
+        /// <summary>
         /// Sorting/filter settings will be applied in memory after database execution.
         /// </summary>
         internal string PostQueryFilterPath { get; set; }
-
-        /// <summary>
-        /// How this is aggregated to the filter.
-        /// </summary>
-        /// <remarks>
-        /// For the time being, only allowing AND conjunctions.
-        /// </remarks>
-        public LogicalConjunctionEnum Conjunction { get; set; } = LogicalConjunctionEnum.AND;
     }
 }
