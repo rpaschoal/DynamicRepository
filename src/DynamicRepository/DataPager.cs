@@ -22,9 +22,29 @@ namespace DynamicRepository
     public class DataPager<Key, Entity> where Entity : class, new()
     {
         /// <summary>
-        /// TODO: Change this to be a plugin setting.
+        /// This is the date time format that will be sent to the pager on datetime filters.
+        /// If your UI has a different date formatt, you can override this by this class constructor.
         /// </summary>
-        private const string DATE_FORMAT = "dd/MM/yyyy";
+        private string UI_DATE_FORMAT = "dd/MM/yyyy";
+
+        /// <summary>
+        /// Default class construcotr.
+        /// </summary>
+        public DataPager()
+        {
+        }
+
+        /// <summary>
+        /// Class constructor.
+        /// </summary>
+        /// <param name="dateFormat">
+        /// Set a DateTime mask format (Same as .NET patterns) to be used when filtering datetime properties. 
+        /// This identifies how the value will come by your API, MVC Controller, etc.
+        /// </param>
+        public DataPager(string dateFormat)
+        {
+            this.UI_DATE_FORMAT = dateFormat;
+        }
 
         /// <summary>
         /// Returns a collection of data results that can be paged.
@@ -108,7 +128,7 @@ namespace DynamicRepository
                             {
                                 // Applies filter do DateTime properties
                                 DateTime castedDateTime;
-                                if (DateTime.TryParseExact(pFilter.Value, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out castedDateTime))
+                                if (DateTime.TryParseExact(pFilter.Value, UI_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out castedDateTime))
                                 {
                                     // Successfully casted the value to a datetime.
                                     queryLinq += (firstExecution ? string.Empty : " " + pFilter.Conjunction + " ") + "DbFunctions.TruncateTime(" + pFilter.Property + nullableValueOperator + ") == @" + paramValues.Count;
@@ -141,7 +161,7 @@ namespace DynamicRepository
                             if (propInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
                             {
                                 DateTime castedDateTime;
-                                if (DateTime.TryParseExact(pFilter.Value, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out castedDateTime))
+                                if (DateTime.TryParseExact(pFilter.Value, UI_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out castedDateTime))
                                 {
                                     // Successfully casted the value to a datetime.
                                     queryLinq += (firstExecution ? string.Empty : " " + pFilter.Conjunction + " ") + navigationPropertyCollection + ".Where(DbFunctions.TruncateTime(" + pFilter.Property.Remove(0, navigationPropertyCollection.Length + 1) + nullableValueOperator + ") == @" + paramValues.Count + ").Count() > 0";
@@ -363,7 +383,7 @@ namespace DynamicRepository
                                     {
                                         // Applies filter do DateTime properties
                                         DateTime castedDateTime;
-                                        if (DateTime.TryParseExact(pFilter.Value, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out castedDateTime))
+                                        if (DateTime.TryParseExact(pFilter.Value, UI_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out castedDateTime))
                                         {
                                             // Successfully casted the value to a datetime.
                                             queryLinq += (!piped ? string.Empty : " OR ") + pipeProperty + nullableValueOperator + ".Date == @" + paramValues.Count;
