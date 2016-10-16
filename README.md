@@ -1,8 +1,8 @@
 # DynamicRepository
 
-Dynamic repository with general/common methods for repository pattern on ASP NET Core projects for EF6 (CoreCLR), EF Core and MongoDB. 
+Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects for EF6 (CoreCLR and .NET Framework 4.5.1), EF Core and MongoDB. 
 
-With this package you get full CRUD data access for your repository + advanced filtering methods with almost no additional code.
+With this package you get instant full CRUD data access for your project + advanced filtering methods with almost no additional code.
 
 You can find the NuGet packages here: https://www.nuget.org/packages?q=DynamicRepository
 
@@ -31,26 +31,28 @@ Filters by data containing "Rafael", sorts by name property
 In most applications there is a need to filter paged-indexed collections (Useful for grids/lists). You can use it as following:
 
 ```cs
-MyEntityRepository.GetPagedDataSource(settings);
+MyEntityRepository.GetPagedData(settings);
 ```
 
-Where "settings" is of "PagedDataSourceSettings" class. In this class you can define filters (+ conjunctions), sort, page and batch size.
+Where "settings" is an instance of "PagedDataSettings" class. In this class you can define filters (+ conjunctions), sort, current page and result set size.
+
+More on the usage of this can be found later on this documentation on the "Advanced Search Usage" section bellow.
 
 ## Usage
 
-Follow the next steps to configure DynamicRepository on your ASP NET 5 project.
+Follow the next steps to configure the DynamicRepository on your ASP NET Core project.
 
 ### Installing package
 
 On your project.json file, add DynamicRepository to your package dependencies (Core if you are on CoreCLR, or .NET if you are on CLR).
 
 ```cs
-"DynamicRepository.Core": "1.0.2-*"
+"DynamicRepository.Core": "1.1.0-*"
 ```
 
 ### Implementation
 
-To leverage use of the package, just create a class for your entity repository (EG: MyEntityRepository.cs) and inherit from DynamicRepository.Core.Repository as following:
+To leverage the use of the package, just create a class for your entity repository (EG: MyEntityRepository.cs) and inherit from DynamicRepository.Core.Repository as following:
 
 ```cs
 public class MyEntityRepository : Repository<int, MyEntity>
