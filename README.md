@@ -115,6 +115,14 @@ The "PagedDataSettings" defines the payload for the Advanced Search Engine. Foll
 * "Page" Property: This is a number that identifies the current page of the result set. This starts by 1.
 * "TotalPerPage" Property: The total rows that will be returned per page on the result set. Default is 20.
 
+#### The FilterSettings class and relevant configuration
+
+* "Property" Property: This is the name of the property you want to filter in your search. You can use dot notation as you would use in any lambda expression. EG: MyEntityRelation.ChildEntityProperty (No nesting limit if there are no collections involved in the path). You can also use deep filtering into child collections (one level of nesting limit) as following EG: MyEntityRelationCollection.ChildEntityProperty.
+* "Value" Property: This is any value to be matched as a "Contains" filter on the search. If you want full match of this value, you need to set the "IsExactMatch" Property to TRUE.
+* "IsExactMatch" Property: If setted to TRUE will match the "Value" property completely. Defaults to FALSE.
+* "Conjunction" Property: This defines how this filter will be aggregated among many other filters on the payload. Most searchs on common scenarios use "AND" and this is the default but if you want you can use an "OR" conjunction as available in the "LogicalConjunctionEnum".
+* "PostQueryFilterPath" Property: This is useful when you use deep nested collection filtering. This will remove the result value of a resulting Select expression in a child colletion of the main result set batch. In EF you always get the full object graph so this is useful to remove undesired child collections content after executing the IQueryable search on your database.
+
 ## Dependencies
 
 This project was implemented on top of these dependencies:
