@@ -31,7 +31,7 @@ Filters by data containing "Rafael", sorts by name property
 In most applications there is a need to filter paged-indexed collections (Useful for grids/lists). You can use it as following:
 
 ```cs
-MyEntityRepository.GetPagedData(this.List(), settings);
+MyEntityRepository.GetPagedData(settings);
 ```
 
 Where "settings" is an instance of "PagedDataSettings" class. In this class you can define filters (+ conjunctions), sort, current page and result set size.
@@ -100,11 +100,11 @@ public interface IMyEntityRepository :  IRepository<int, MyEntity>
 Call your Repository implementation as following to use the Advanced Search feature:
 
 ```cs
-MyEntityRepository.GetPagedData(this.List(), settings);
+MyEntityRepository.GetPagedData(settings);
 ```
 
 * The first argument is your IQueryable data source. For most cases just use the repository's list method which will return the current DbSet as the source.
-* The second argument is a payload with all the settings for the advanced search defined by the "PagedDataSettings" class. This payload will be discussed further bellow.
+* The data source of this method call will come from the repository's "List" method. If you override the "List" method and apply any kind of filter, this will inflict directly on the advanced search result. If you need to apply pre-filters to the search only, please check "PreConditionsToPagedDataFilter" extension bellow.
 
 #### The PagedDataSettings class and relevant configuration
 
@@ -126,6 +126,25 @@ The "PagedDataSettings" defines the payload for the Advanced Search Engine. Foll
 #### The SortingSettings class and relevant configuration
 * "Property" Property: This is the name of the property in your Entity class where you want the "OrderBy" expression to be applied.
 * "Order" Property: This is the data sorting order you want to be applied in this "OrderBy" expression. Default is Ascending.
+
+#### Oh no! I have a very unique scenario and I think this search won't fit me!
+
+Don't worry about it if you are questioning this to yourself. If for any reason the default filtering mechanism does not fit your requirement you can use the one of the following:
+
+##### "PreConditionsToPagedDataFilter" Extension:
+
+Sometimes we want to add custom data filtering to the data source before returning it to the user for him to do any search, sorting, or whatever he wants to do on the UI. This may be to apply security filters, checking logical deletes, or etc (This can also be overriden in your base list method but if you want rules to be applied only on search keep with this event).
+
+To do so, simply override the "PreConditionsToPagedDataFilter" method within every repository and apply whatever rules you have. This uses Lambda Expressions that will be appended to the fetching of the advanced search (How cool is that?):
+
+```cs
+protected override Expression<Func<MyEntity, bool>> PreConditionsToPagedDataFilter(PagedDataSettings settings)
+{
+  return x => x.MyProperty == "Whatever You Want"
+}
+```
+
+The "settings" payload is available at this context and you can read all settings and its relevant values if you need to.
 
 ## Dependencies
 
