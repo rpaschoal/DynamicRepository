@@ -108,6 +108,12 @@ MyEntityRepository.GetPagedData(this.List(), settings);
 
 #### The PagedDataSettings class and relevant configuration
 
+The "PagedDataSettings" defines the payload for the Advanced Search Engine. Following you can find the details of all relevant configuration:
+
+* "Filter" Property: This is a collection of "FilterSettings" class which holds all properties definitions and values to be applied as search arguments.
+* "Order" Property: This is a collection of "SortingSettings" with all properties that should be sorted by in the search result set.
+* "Page" Property: This is a number that identifies the current page of the result set. This starts by 1.
+* "TotalPerPage" Property: The total rows that will be returned per page on the result set. Default is 20.
 
 ## Dependencies
 
