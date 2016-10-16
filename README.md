@@ -95,6 +95,8 @@ public interface IMyEntityRepository :  IRepository<int, MyEntity>
 }
 ```
 
+This is all you need to set it up and access data in your project (Considering your EF or MongoDB DBContexts are working properly).
+
 ### Advanced Search Usage
 
 Call your Repository implementation as following to use the Advanced Search feature:
