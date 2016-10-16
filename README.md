@@ -97,7 +97,7 @@ public interface IMyEntityRepository :  IRepository<int, MyEntity>
 
 ### Advanced Search Usage
 
-On your WebAPI or MVC Controller call your Repository implementation search as following:
+Call your Repository implementation as following to use the Advanced Search feature:
 
 ```cs
 MyEntityRepository.GetPagedData(this.List(), settings);
