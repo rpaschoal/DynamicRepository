@@ -18,7 +18,7 @@ MyEntityRepository.Delete(MyEntity);
 MyEntityRepository.Delete(1);
 ```
 
-### Filtering
+### Basic Filtering
 
 ```cs
 MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.OrderBy(y => y.Name));
@@ -26,12 +26,12 @@ MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.OrderBy(y => y.Na
 
 Filters by data containing "Rafael", sorts by name property
 
-### Paged filtering
+### Advanced Search Engine
 
 In most applications there is a need to filter paged-indexed collections (Useful for grids/lists). You can use it as following:
 
 ```cs
-MyEntityRepository.GetPagedData(settings);
+MyEntityRepository.GetPagedData(this.List(), settings);
 ```
 
 Where "settings" is an instance of "PagedDataSettings" class. In this class you can define filters (+ conjunctions), sort, current page and result set size.
@@ -94,6 +94,20 @@ public interface IMyEntityRepository :  IRepository<int, MyEntity>
   /* Any additional methods definitions comes here */
 }
 ```
+
+### Advanced Search Usage
+
+On your WebAPI or MVC Controller call your Repository implementation search as following:
+
+```cs
+MyEntityRepository.GetPagedData(this.List(), settings);
+```
+
+* The first argument is your IQueryable data source. For most cases just use the repository's list method which will return the current DbSet as the source.
+* The second argument is a payload with all the settings for the advanced search defined by the "PagedDataSettings" class. This payload will be discussed further bellow.
+
+#### The PagedDataSettings class and relevant configuration
+
 
 ## Dependencies
 
