@@ -94,6 +94,7 @@ public interface IMyEntityRepository :  IRepository<int, MyEntity>
   /* Any additional methods definitions comes here */
 }
 ```
+### You are ready to go! Use it :)
 
 This is all you need to set it up and access data in your project (Considering your EF or MongoDB DBContexts are working properly).
 
@@ -131,7 +132,7 @@ The "PagedDataSettings" defines the payload for the Advanced Search Engine. Foll
 
 #### Oh no! I have a very unique scenario and I think this search won't be useful to me!
 
-Don't worry about it if you are questioning this to yourself. If for any reason the default filtering mechanism does not fit your requirement you can use the one of the following:
+Don't worry about it if you are questioning this to yourself. If for any reason the default filtering mechanism does not fit your requirement you can use one of the following:
 
 ##### "PreConditionsToPagedDataFilter" Extension:
 
