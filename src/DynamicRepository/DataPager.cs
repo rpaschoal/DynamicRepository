@@ -50,7 +50,7 @@ namespace DynamicRepository
                 }
 
                 // Adds composed filter to the query here (This is the default filter inspector bult-in for the search).
-                // This is a merge result from default query engine + customized queries from devs (AddExtraPagedDataFilter method).
+                // This is a merge result from default query engine + customized queries from devs (ExtraPagedDataFilter method).
                 pagedDataQuery = pagedDataQuery.Where(MergeFilters(settings, DefaultPagedDataFilter(settings), ExtraPagedDataFilter, settings.SearchInALL));
 
                 // Adds sorting capabilities
@@ -59,14 +59,8 @@ namespace DynamicRepository
                 // Total number of records regardless of paging.
                 var totalRecordsInDB = pagedDataQuery.AsExpandable().Count();
 
-                // Shapes final result model
-                return new PagedDataResult<Entity>(pagedDataQuery.AsExpandable().Count())
-                {
-                    Result = pagedDataQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToList()
-                };
-
-                // TODO: Make in memory callback work on later time.
-                //return pagedDataQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().ToWrapperPaged(totalRecordsInDB, (p) => InMemoryOperationsCallback(p, settings));
+                // Shapes final result model. Post query filters to inner collection data are applied at this moment.
+                return pagedDataQuery.Skip((settings.Page - 1) * settings.TotalPerPage).Take(settings.TotalPerPage).AsExpandable().BuildUpResult(totalRecordsInDB, (p) => PostQueryCallbacksInvoker(p, settings));
             }
             catch (Exception ex)
             {
