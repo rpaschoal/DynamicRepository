@@ -123,6 +123,10 @@ The "PagedDataSettings" defines the payload for the Advanced Search Engine. Foll
 * "Conjunction" Property: This defines how this filter will be aggregated among many other filters on the payload. Most searchs on common scenarios use "AND" and this is the default but if you want you can use an "OR" conjunction as available in the "LogicalConjunctionEnum".
 * "PostQueryFilterPath" Property: This is useful when you use deep nested collection filtering. This will remove the result value of a resulting Select expression in a child colletion of the main result set batch. In EF you always get the full object graph so this is useful to remove undesired child collections content after executing the IQueryable search on your database.
 
+#### The SortingSettings class and relevant configuration
+* "Property" Property: This is the name of the property in your Entity class where you want the "OrderBy" expression to be applied.
+* "Order" Property: This is the data sorting order you want to be applied in this "OrderBy" expression. Default is Ascending.
+
 ## Dependencies
 
 This project was implemented on top of these dependencies:
