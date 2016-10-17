@@ -208,10 +208,10 @@ namespace DynamicRepository
             bool noFilterApplied = true;
 
             // Generates the order clause based on supplied parameters
-            if (settings.Order != null && settings.Order.Count > 0)
+            if (settings.Sorting != null && settings.Sorting.Count > 0)
             {
                 var bufferedSortByClause = string.Empty;
-                var validOrderSettings = settings.Order.Where(x => !String.IsNullOrEmpty(x.Property) && String.IsNullOrEmpty(x.PostQuerySortingPath)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
+                var validOrderSettings = settings.Sorting.Where(x => !String.IsNullOrEmpty(x.Property) && String.IsNullOrEmpty(x.PostQuerySortingPath)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
 
                 foreach (var o in validOrderSettings)
                 {
@@ -229,9 +229,18 @@ namespace DynamicRepository
 
                             bufferedSortByClause += o.Property + " " + o.Order.ToString() + ",";
                         }
+                        else if (collectionPathTotal == 1)
+                        {
+                            // Deferring this to a post query sorting event as it can't be evaluated by a DB Query Graph Result.
+                            if (string.IsNullOrEmpty(o.PostQuerySortingPath))
+                            {
+                                o.PostQuerySortingPath = o.Property;
+                            }
+                        }
                         else
                         {
-                            throw new Exception($"Database translated queries for collection properties are not supported. Please use method: {nameof(this.PostQueryFilter)}.");
+                            // Only one level of deep collection supported at the moment.
+                            throw new Exception($"The Advanced Search Engine only supports sorting in a one level nested collection path. Any dot notation path that contains more than one inner collection property is not supported.");
                         }
                     }
                 }
@@ -245,7 +254,7 @@ namespace DynamicRepository
             }
 
             // If there is no sorting configured, we need to add a default fallback one, which we will use the first property. Without this can't use LINQ Skip/Take
-            if (settings.Order == null || settings.Order.Count == 0 || noFilterApplied)
+            if (settings.Sorting == null || settings.Sorting.Count == 0 || noFilterApplied)
             {
                 var propCollection = typeof(Entity).GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(x => !typeof(IEnumerable).IsAssignableFrom(x.PropertyType)).ToList();
 
@@ -431,9 +440,9 @@ namespace DynamicRepository
         private IList PostQuerySort(IList fetchedResult, PagedDataSettings settings)
         {
             // Generates the order clause based on supplied parameters
-            if (settings.Order != null && settings.Order.Count > 0)
+            if (settings.Sorting != null && settings.Sorting.Count > 0)
             {
-                var validOrderSettings = settings.Order.Where(x => !String.IsNullOrEmpty(x.Property) && !String.IsNullOrEmpty(x.PostQuerySortingPath)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
+                var validOrderSettings = settings.Sorting.Where(x => !String.IsNullOrEmpty(x.Property) && !String.IsNullOrEmpty(x.PostQuerySortingPath)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
 
                 foreach (var o in validOrderSettings)
                 {
@@ -451,22 +460,7 @@ namespace DynamicRepository
                             // Gets the property reference
                             var collectionProp = result.GetPropValue(navigationPropertyCollection);
 
-                            if (typeof(IQueryable).IsAssignableFrom(collectionProp.GetType()))
-                            {
-                                // Applies filter to the IQueryable since it was inMemory Filtered.
-                                collectionProp = ((IQueryable)collectionProp).OrderBy(o.PostQuerySortingPath.Substring(navigationPropertyCollection.Length + 1) + " " + o.Order.ToString());
-
-                                // Filter in memory data here
-                                result.SetPropValue(navigationPropertyCollection, collectionProp, true);
-                            }
-                            else
-                            {
-                                // Applies filter to the nested collection within the main entity.
-                                collectionProp = ((IList)collectionProp).AsQueryable().OrderBy(o.PostQuerySortingPath.Substring(navigationPropertyCollection.Length + 1) + " " + o.Order.ToString());
-
-                                // Filter in memory data here
-                                result.SetPropValue(navigationPropertyCollection, collectionProp, true);
-                            }
+                            result.RearrangeCollectionInstance(navigationPropertyCollection, o.PostQuerySortingPath.Substring(navigationPropertyCollection.Length + 1) + " " + o.Order.ToString());
                         }
                     }
                 }

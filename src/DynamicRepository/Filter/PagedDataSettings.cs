@@ -27,7 +27,7 @@ namespace DynamicRepository.Filter
         /// <summary>
         /// Desired sorting order of the data.
         /// </summary>
-        public IList<SortingSettings> Order { get; set; } = new List<SortingSettings>();
+        public IList<SortingSettings> Sorting { get; set; } = new List<SortingSettings>();
 
         /// <summary> 
         /// Page index. Default is 1. Index starts on 1.

@@ -60,10 +60,10 @@ namespace DynamicRepository
 
             foreach (var property in props)
             {
-                if (settings.Order != null)
+                if (settings.Sorting != null)
                 {
                     // Searchs replacements for sort queries.
-                    var item = settings.Order.Where(x => x.Property == property.MapsFrom).FirstOrDefault();
+                    var item = settings.Sorting.Where(x => x.Property == property.MapsFrom).FirstOrDefault();
                     if (item != null)
                     {
                         item.Property = property.MapsTo;
@@ -134,14 +134,14 @@ namespace DynamicRepository
 
         private static void TranslateDefaultSorting(PagedDataSortingAttribute sortingAttribute, PagedDataSettings settings)
         {
-            if (settings.Order == null || settings.Order.Count == 0)
+            if (settings.Sorting == null || settings.Sorting.Count == 0)
             {
-                if (settings.Order == null)
-                    settings.Order = new List<SortingSettings>();
+                if (settings.Sorting == null)
+                    settings.Sorting = new List<SortingSettings>();
 
                 if (sortingAttribute != null)
                 {
-                    settings.Order.Add(new SortingSettings()
+                    settings.Sorting.Add(new SortingSettings()
                     {
                         Property = sortingAttribute.Property,
                         Order = sortingAttribute.IsAscending ? SortOrderEnum.ASC : SortOrderEnum.DESC

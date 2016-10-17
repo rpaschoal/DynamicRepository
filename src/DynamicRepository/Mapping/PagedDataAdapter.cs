@@ -138,14 +138,14 @@ namespace DynamicRepository.Mapping
         {
             foreach (var property in props)
             {
-                if (settings.Order != null)
+                if (settings.Sorting != null)
                 {
                     // Searchs filter configurations sent by consumer.
-                    var item = settings.Order.Where(x => x.Property == property.PropFrom).FirstOrDefault();
+                    var item = settings.Sorting.Where(x => x.Property == property.PropFrom).FirstOrDefault();
 
                     if (item != null)
                     {
-                        transformedSettings.Order.Add(
+                        transformedSettings.Sorting.Add(
                         new SortingSettings()
                         {
                             Property = property.MapsTo,
@@ -156,11 +156,11 @@ namespace DynamicRepository.Mapping
             }
 
             // Only applies this default sorting if consumer specified none.
-            if (transformedSettings.Order == null || transformedSettings.Order.Count == 0)
+            if (transformedSettings.Sorting == null || transformedSettings.Sorting.Count == 0)
             {
                 if (sortingAttribute != null)
                 {
-                    transformedSettings.Order.Add(new SortingSettings()
+                    transformedSettings.Sorting.Add(new SortingSettings()
                     {
                         Property = sortingAttribute.Property,
                         Order = sortingAttribute.IsAscending ? SortOrderEnum.ASC : SortOrderEnum.DESC

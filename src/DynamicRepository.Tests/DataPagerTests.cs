@@ -122,7 +122,7 @@ namespace DynamicRepository.Tests
                 TotalPerPage = pagedSize
             };
 
-            settings.Order.Add(new SortingSettings()
+            settings.Sorting.Add(new SortingSettings()
             {
                 Property = "Label",
                 // Order =  SortOrderEnum.ASC // Should default to ASC
@@ -151,7 +151,7 @@ namespace DynamicRepository.Tests
                 TotalPerPage = pagedSize
             };
 
-            settings.Order.Add(new SortingSettings()
+            settings.Sorting.Add(new SortingSettings()
             {
                 Property = "Label",
                 Order =  SortOrderEnum.DESC // Should default to ASC
@@ -182,6 +182,7 @@ namespace DynamicRepository.Tests
 
             settings.Filter.Add(new FilterSettings()
             {
+                PostQueryFilterPath = "ChildCollection.Label",
                 Property = "ChildCollection.Label",
                 Value = "First"
             });
@@ -224,6 +225,126 @@ namespace DynamicRepository.Tests
             // Assert
             Assert.True(result.TotalRecords == 0);
             Assert.True(result.Result.Count() == 0);
+        }
+
+        [Fact]
+        public void CanSortPostQueryPathsByAscending()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 10;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Sorting.Add(new SortingSettings()
+            {
+                Property = "ChildCollection.Label",
+                Order = SortOrderEnum.ASC
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.Result[7].ChildCollection[0].Label.Contains("First"));
+            Assert.True(result.Result[7].ChildCollection[1].Label.Contains("Second"));
+            Assert.True(result.Result[7].ChildCollection[2].Label.Contains("Third"));
+        }
+
+        [Fact]
+        public void CanSortPostQueryPathsByDescending()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 10;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Sorting.Add(new SortingSettings()
+            {
+                Property = "ChildCollection.Label",
+                Order = SortOrderEnum.DESC
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.Result[7].ChildCollection[0].Label.Contains("Third"));
+            Assert.True(result.Result[7].ChildCollection[1].Label.Contains("Second"));
+            Assert.True(result.Result[7].ChildCollection[2].Label.Contains("First"));  
+        }
+
+        [Fact]
+        public void CanFilterAndSortPostQueryPathsByAscending()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Filter.Add(new FilterSettings()
+            {
+                Property = "ChildCollection.Label",
+                Value = "First"
+            });
+
+            settings.Sorting.Add(new SortingSettings()
+            {
+                Property = "ChildCollection.Label",
+                Order = SortOrderEnum.ASC
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.Result[0].ChildCollection[0].Label.Contains("First"));
+            Assert.True(result.Result[0].ChildCollection[1].Label.Contains("Second"));
+            Assert.True(result.Result[0].ChildCollection[2].Label.Contains("Third"));
+        }
+
+        [Fact]
+        public void CanFilterAndSortPostQueryPathsByDescending()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Filter.Add(new FilterSettings()
+            {
+                Property = "ChildCollection.Label",
+                Value = "First"
+            });
+
+            settings.Sorting.Add(new SortingSettings()
+            {
+                Property = "ChildCollection.Label",
+                Order = SortOrderEnum.DESC
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.Result[0].ChildCollection[0].Label.Contains("Third"));
+            Assert.True(result.Result[0].ChildCollection[1].Label.Contains("Second"));
+            Assert.True(result.Result[0].ChildCollection[2].Label.Contains("First"));
         }
     }
 }

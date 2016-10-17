@@ -218,10 +218,49 @@ namespace DynamicRepository.Extensions
                 // Gets the property reference
                 var collectionProp = instanceHolder.GetPropValue(collectionPath);
 
+                // Gets generic type argument of the collection
+                var genericTypeArgument = collectionProp.GetType().GetTypeInfo().GenericTypeArguments[0];
+
                 // Applies filter to the nested collection within the main entity.
-                collectionProp = ((System.Collections.IList)collectionProp).AsQueryable().Where(query);
+                var resultSet = ((System.Collections.IList)collectionProp).AsQueryable().Where(query);
+                var method = typeof(DynamicEnumerableExtensions).GetMethods().Where(x => x.Name == "ToDynamicList" && x.IsGenericMethod == true).First();
+
+                collectionProp = method.MakeGenericMethod(genericTypeArgument).Invoke(resultSet, new object[] { resultSet });
 
                 // Filter in memory data here
+                instanceHolder.SetPropValue(collectionPath, collectionProp, true);
+            }
+        }
+
+        /// <summary>
+        /// Rearranges the value of a collection property within an object based on an EF Dynamic OrderBy.
+        /// </summary>
+        public static void RearrangeCollectionInstance(this object instanceHolder, string collectionPath, string orderBy)
+        {
+            if (!String.IsNullOrEmpty(orderBy))
+            {
+                // Gets the property reference
+                var collectionProp = instanceHolder.GetPropValue(collectionPath);
+
+                // Gets generic type argument of the collection
+                var genericTypeArgument = collectionProp.GetType().GetTypeInfo().GenericTypeArguments[0];
+
+                // ToDynamicList method extension from Dynamic Linq library
+                var method = typeof(DynamicEnumerableExtensions).GetMethods().Where(x => x.Name == "ToDynamicList" && x.IsGenericMethod == true).First();
+
+                // Applies filter to the nested collection within the main entity.
+                if (typeof(IQueryable).IsAssignableFrom(collectionProp.GetType()))
+                {
+                    var resultSet = ((IQueryable)collectionProp).AsQueryable().OrderBy(orderBy);
+                    collectionProp = method.MakeGenericMethod(genericTypeArgument).Invoke(resultSet, new object[] { resultSet });
+                }
+                else
+                {
+                    var resultSet = ((System.Collections.IList)collectionProp).AsQueryable().OrderBy(orderBy);
+                    collectionProp = method.MakeGenericMethod(genericTypeArgument).Invoke(resultSet, new object[] { resultSet });
+                }
+
+                // Replaces current collection property with rearranged one.
                 instanceHolder.SetPropValue(collectionPath, collectionProp, true);
             }
         }

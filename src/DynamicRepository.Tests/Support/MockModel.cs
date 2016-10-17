@@ -73,15 +73,21 @@ namespace DynamicRepository.Tests.Support
                     Label = "Eigth Label",
                     ChildCollection = new List<MockModel>()
                     {
-                        new MockModel()
-                        {
-                            Id = 999,
-                            Label = "Inner First"
-                        },
+                        // Randomly Ordered for sorting unit tests of post filtering.
                         new MockModel()
                         {
                             Id = 998,
                             Label = "Inner Second"
+                        },
+                        new MockModel()
+                        {
+                            Id = 997,
+                            Label = "Inner Third"
+                        },
+                        new MockModel()
+                        {
+                            Id = 999,
+                            Label = "Inner First"
                         }
                     }
                 },
