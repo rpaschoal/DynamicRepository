@@ -42,7 +42,7 @@ More on the usage of this can be found later on this documentation on the "Advan
 
 Follow the next steps to configure the DynamicRepository on your ASP NET Core project.
 
-### Installing package
+### Installing the package
 
 On your project.json file, add DynamicRepository to your package dependencies (Core if you are on CoreCLR, or .NET if you are on CLR).
 
@@ -134,14 +134,14 @@ The "PagedDataSettings" defines the payload for the Advanced Search Engine. Foll
 
 Don't worry about it if you are questioning this to yourself. If for any reason the default filtering mechanism does not fit your requirement you can use one of the following:
 
-##### "AddPreConditionsPagedDataFilter" Extension:
+##### "AddPreConditionsPagedDataFilters" Extension:
 
 Sometimes we want to add custom data filtering to the data source before returning it to the user for him to do any search, sorting, or whatever he wants to do on the UI. This may be to apply security filters, checking logical deletes, or etc (This can also be overriden in your base list method but if you want rules to be applied only on search keep with this event).
 
-To do so, simply override the "AddPreConditionsPagedDataFilter" method within every repository and apply whatever rules you have. This uses Lambda Expressions that will be appended to the fetching of the advanced search (How cool is that?):
+To do so, simply override the "AddPreConditionsPagedDataFilters" method within every repository and apply whatever rules you have. This uses Lambda Expressions that will be appended to the fetching of the advanced search (How cool is that?):
 
 ```cs
-protected override Expression<Func<MyEntity, bool>> AddPreConditionsPagedDataFilter(PagedDataSettings settings)
+protected override Expression<Func<MyEntity, bool>> AddPreConditionsPagedDataFilters(PagedDataSettings settings)
 {
   return x => x.MyProperty == "Whatever You Want"
 }
@@ -149,12 +149,12 @@ protected override Expression<Func<MyEntity, bool>> AddPreConditionsPagedDataFil
 
 The "settings" payload is available at this context and you can read all settings and its relevant values if you need to.
 
-##### "AddExtraPagedDataFilter" Extension:
+##### "AddExtraPagedDataFilters" Extension:
 
-If you need to apply rules to the result set but they need to be appended among with the filter settings that compose a user's search (or any other case where the default mechanism does not fit. EG: When one filter applies to 2 or more properties combined together of an entity) you can use the "AddExtraPagedDataFilter" extension by overriding it as following:
+If you need to apply rules to the result set but they need to be appended among with the filter settings that compose a user's search (or any other case where the default mechanism does not fit. EG: When one filter applies to 2 or more properties combined together of an entity) you can use the "AddExtraPagedDataFilters" extension by overriding it as following:
 
 ```cs
-protected override Expression<Func<MyEntity, bool>> AddExtraPagedDataFilter(PagedDataSettings settings)
+protected override Expression<Func<MyEntity, bool>> AddExtraPagedDataFilters(PagedDataSettings settings)
 {
   return x => x.MyProperty == "Whatever You Want"
 }
