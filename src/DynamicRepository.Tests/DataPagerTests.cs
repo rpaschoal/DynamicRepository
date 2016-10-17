@@ -241,7 +241,7 @@ namespace DynamicRepository.Tests
 
             settings.Sorting.Add(new SortingSettings()
             {
-                Property = "ChildCollection.Label",
+                PostQuerySortingPath = "ChildCollection.Label",
                 Order = SortOrderEnum.ASC
             });
 
@@ -268,7 +268,7 @@ namespace DynamicRepository.Tests
 
             settings.Sorting.Add(new SortingSettings()
             {
-                Property = "ChildCollection.Label",
+                PostQuerySortingPath = "ChildCollection.Label",
                 Order = SortOrderEnum.DESC
             });
 
@@ -301,7 +301,7 @@ namespace DynamicRepository.Tests
 
             settings.Sorting.Add(new SortingSettings()
             {
-                Property = "ChildCollection.Label",
+                PostQuerySortingPath = "ChildCollection.Label",
                 Order = SortOrderEnum.ASC
             });
 
@@ -334,7 +334,7 @@ namespace DynamicRepository.Tests
 
             settings.Sorting.Add(new SortingSettings()
             {
-                Property = "ChildCollection.Label",
+                PostQuerySortingPath = "ChildCollection.Label",
                 Order = SortOrderEnum.DESC
             });
 

@@ -26,6 +26,6 @@ namespace DynamicRepository.Filter
         /// <summary>
         /// This sorting settings will be applied in memory after hitting database.
         /// </summary>
-        internal string PostQuerySortingPath { get; set; }
+        public string PostQuerySortingPath { get; set; }
     }
 }

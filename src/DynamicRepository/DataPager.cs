@@ -333,7 +333,7 @@ namespace DynamicRepository
             if (settings.Filter != null && settings.Filter.Count > 0 && !settings.SearchInALL)
             {
                 var validFilterSettings = settings.Filter
-                                                  .Where(x => !String.IsNullOrEmpty(x.Property) && !String.IsNullOrEmpty(x.Value) && !String.IsNullOrEmpty(x.PostQueryFilterPath))
+                                                  .Where(x => !String.IsNullOrEmpty(x.Value) && !String.IsNullOrEmpty(x.PostQueryFilterPath))
                                                   .GroupBy(x => x.Property)
                                                   .Select(y => y.FirstOrDefault());
 
@@ -442,7 +442,7 @@ namespace DynamicRepository
             // Generates the order clause based on supplied parameters
             if (settings.Sorting != null && settings.Sorting.Count > 0)
             {
-                var validOrderSettings = settings.Sorting.Where(x => !String.IsNullOrEmpty(x.Property) && !String.IsNullOrEmpty(x.PostQuerySortingPath)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
+                var validOrderSettings = settings.Sorting.Where(x => !String.IsNullOrEmpty(x.PostQuerySortingPath)).GroupBy(x => x.Property).Select(y => y.FirstOrDefault());
 
                 foreach (var o in validOrderSettings)
                 {
