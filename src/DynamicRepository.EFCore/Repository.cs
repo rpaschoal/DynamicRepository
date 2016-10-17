@@ -118,6 +118,14 @@ namespace DynamicRepository.EFCore
         }
 
         /// <summary>
+        /// Returns all entries of this entity.
+        /// </summary>
+        public IEnumerable<Entity> ListAll()
+        {
+            return this.DbSet.ToList();
+        }
+
+        /// <summary>
         /// Filter, order and join the current entity based on criterias supplied as parameters.
         /// </summary>
         /// <param name="filter">Expression which supplies all desired filters.</param>

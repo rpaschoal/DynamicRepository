@@ -115,9 +115,17 @@ namespace DynamicRepository.MongoDB
             _collection.DeleteOne(GetIdFilter(entityToDelete));
         }
 
+        /// <summary>
+        /// Returns all entries of this entity.
+        /// </summary>
+        public IEnumerable<Entity> ListAll()
+        {
+            return _collection.AsQueryable().ToList();
+        }
+
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
         {
-            // TODO: Have a look on this later...
+            // TODO: Have a look on this later... Won't be implemented for 1.1.0
             throw new NotImplementedException();
         }
 

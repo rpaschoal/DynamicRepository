@@ -45,6 +45,11 @@ namespace DynamicRepository
         void Delete(Entity entityToDelete);
 
         /// <summary>
+        /// Returns all entries of this entity.
+        /// </summary>
+        IEnumerable<Entity> ListAll();
+
+        /// <summary>
         /// Filter, order and join the current entity based on criterias supplied as parameters.
         /// </summary>
         /// <param name="filter">Expression which supplies all desired filters.</param>
