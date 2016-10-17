@@ -82,7 +82,6 @@ namespace DynamicRepository.EF
         public virtual void Insert(Entity entity)
         {
             DbSet.Add(entity);
-            Context.SaveChanges();
         }
 
         /// <summary>
@@ -92,7 +91,6 @@ namespace DynamicRepository.EF
         public virtual void Update(Entity entityToUpdate)
         {
             Context.Entry(entityToUpdate).State = EntityState.Modified;
-            Context.SaveChanges();
         }
 
         /// <summary>
@@ -102,7 +100,6 @@ namespace DynamicRepository.EF
         public virtual void Delete(Key id)
         {
             Delete(this.Get(id));
-            Context.SaveChanges();
         }
 
         /// <summary>
@@ -114,7 +111,6 @@ namespace DynamicRepository.EF
             if (entityToDelete != null)
             {
                 DbSet.Remove(entityToDelete);
-                Context.SaveChanges();
             }
         }
 
