@@ -17,6 +17,8 @@ namespace DynamicRepository.Tests.Support
 
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
+        public IList<MockModel> ChildCollection { get; set; } = new List<MockModel>();
+
         /// <summary>
         /// Provides a collection of data to be used in arrange phase of unit tests.
         /// </summary>
@@ -68,7 +70,20 @@ namespace DynamicRepository.Tests.Support
                 new MockModel()
                 {
                     Id = 1,
-                    Label = "Eigth Label"
+                    Label = "Eigth Label",
+                    ChildCollection = new List<MockModel>()
+                    {
+                        new MockModel()
+                        {
+                            Id = 999,
+                            Label = "Inner First"
+                        },
+                        new MockModel()
+                        {
+                            Id = 998,
+                            Label = "Inner Second"
+                        }
+                    }
                 },
                 new MockModel()
                 {

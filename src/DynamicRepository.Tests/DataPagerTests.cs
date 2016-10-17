@@ -164,5 +164,66 @@ namespace DynamicRepository.Tests
             Assert.True(result.Result.First().Label == "Third Label");
             Assert.True(result.Result.Last().Label == "Nineth");
         }
+
+        /// <summary>
+        /// Identifies if the advanced search engine can do post query filters and data removal to child collections of a result set.
+        /// </summary>
+        [Fact]
+        public void CanFilterPostQueryPaths()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Filter.Add(new FilterSettings()
+            {
+                Property = "ChildCollection.Label",
+                Value = "First"
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.TotalRecords == 1);
+            Assert.True(result.Result.Count() == 1);
+            Assert.True(result.Result.First().Label == "Eigth Label");
+        }
+
+        /// <summary>
+        /// Identifies if the advanced search engine can do post query filters and data removal 
+        /// to child collections of a result set by exact match filters.
+        /// </summary>
+        [Fact]
+        public void CanFilterPostQueryPathsByExactMatch()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+            var pagedSize = 5;
+
+            var settings = new PagedDataSettings()
+            {
+                TotalPerPage = pagedSize
+            };
+
+            settings.Filter.Add(new FilterSettings()
+            {
+                Property = "ChildCollection.Label",
+                Value = "First",
+                IsExactMatch = true
+            });
+
+            // Act
+            var result = _dataPager.GetPagedData(items.AsQueryable(), settings);
+
+            // Assert
+            Assert.True(result.TotalRecords == 0);
+            Assert.True(result.Result.Count() == 0);
+        }
     }
 }

@@ -95,6 +95,30 @@ namespace DynamicRepository.Extensions
                         Type type = obj.GetType();
                         info = type.GetProperty(part);
 
+                        // May be a collection type. Lets try to proceed with this thought.
+                        if (info == null)
+                        {
+                            var genericTypeForCollection = type.GetGenericArguments().SingleOrDefault();
+                            if (genericTypeForCollection != null)
+                            {
+                                info = genericTypeForCollection.GetProperty(part);
+
+                                if (info != null)
+                                {
+                                    if (info.PropertyType.GetConstructor(Type.EmptyTypes) != null)
+                                    {
+                                        obj = Activator.CreateInstance(info.PropertyType);
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        // Stopping here, can't go further.
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
                         if (info == null) { break; }
 
                         obj = info.GetValue(obj, null);
@@ -103,7 +127,7 @@ namespace DynamicRepository.Extensions
 
                 return info;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -137,7 +161,19 @@ namespace DynamicRepository.Extensions
                                 info = genericTypeForCollection.GetProperty(part);
                                 collectionPathTotal++;
 
-                                if (info != null) { obj = Activator.CreateInstance(info.PropertyType); continue; }
+                                if (info != null)
+                                {
+                                    if (info.PropertyType.GetConstructor(Type.EmptyTypes) != null)
+                                    {
+                                        obj = Activator.CreateInstance(info.PropertyType);
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        // Stopping here, can't go further.
+                                        break;
+                                    }
+                                }
                             }
                         }
 
@@ -149,7 +185,7 @@ namespace DynamicRepository.Extensions
 
                 return info;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }
