@@ -19,6 +19,14 @@ MyEntityRepository.Delete(1);
 MyEntityRepository.ListAll();
 ```
 
+For EF and EFCore you must call the "SaveChanges" on your Application after using any of the following methods since the DynamicRepository won't do it in order to support the Unit Of Work pattern:
+
+* Insert
+* Update
+* Delete
+
+For more information about the Unit Of Work pattern: https://www.asp.net/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
+
 ### Basic Filtering
 
 ```cs
