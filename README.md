@@ -16,6 +16,7 @@ MyEntityRepository.Get(1);
 MyEntityRepository.Update(MyEntity);
 MyEntityRepository.Delete(MyEntity);
 MyEntityRepository.Delete(1);
+MyEntityRepository.ListAll();
 ```
 
 ### Basic Filtering
@@ -24,11 +25,13 @@ MyEntityRepository.Delete(1);
 MyEntityRepository.List(x => x.Name.Contains("Rafael"), x => x.OrderBy(y => y.Name));
 ```
 
-Filters by data containing "Rafael", sorts by name property
+Filters by data containing "Rafael" and then sorts by a "Name" property.
 
 ### Advanced Search Engine
 
-In most applications there is a need to filter paged-indexed collections (Useful for grids/lists). You can use it as following:
+In most applications there is a need to filter paged-indexed collections (Useful for grids/lists). This project offers a built-in advanced search out of the box which can perform search, sorting and paging in all your repository entities.
+
+Usage example:
 
 ```cs
 MyEntityRepository.GetPagedData(settings);
