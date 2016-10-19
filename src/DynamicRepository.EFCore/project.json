@@ -1,13 +1,25 @@
 {
-  "title": "DynamicRepository for Entity Framework Core",
+  "title": "DynamicRepository.Core",
   "copyright": "Rafael Carvalho",
   "description": "https://github.com/rpaschoal/DynamicRepository",
-  "version": "1.1.0-*",
+  "version": "1.1.2-*",
+
+  "packOptions": {
+    "summary": "Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects using EF Core.",
+    "tags": [ "repository", "pattern", "dynamic", "core" ],
+    "owners": [ "Rafael Carvalho" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/rpaschoal/DynamicRepository"
+    },
+    "projectUrl": "https://github.com/rpaschoal/DynamicRepository",
+    "releaseNotes": ""
+  },
 
   "dependencies": {
-    "LinqKit.Core": "1.0.1",
+    "Microsoft.EntityFrameworkCore": "1.0.1",
     "System.Linq.Dynamic.Core": "1.0.3.4",
-    "DynamicRepository": "1.1.0-*"
+    "DynamicRepository": "1.1.2-*"
   },
 
   "frameworks": {

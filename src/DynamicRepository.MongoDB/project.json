@@ -1,8 +1,20 @@
 ﻿{
   "version": "0.1.0-*",
 
+  "packOptions": {
+    "summary": "Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects using MongoDB.",
+    "tags": [ "repository", "pattern", "dynamic", "core" ],
+    "owners": [ "Rafael Carvalho" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/rpaschoal/DynamicRepository"
+    },
+    "projectUrl": "https://github.com/rpaschoal/DynamicRepository",
+    "releaseNotes": ""
+  },
+
   "dependencies": {
-    "DynamicRepository": "1.1.0-*",
+    "DynamicRepository": "1.1.2-*",
     "mongocsharpdriver": "2.3.0-beta1",
     "MongoDB.Driver": "2.3.0-beta1",
     "MongoDB.Driver.Core": "2.3.0-beta1"

@@ -11,7 +11,7 @@ namespace DynamicRepository.EFCore
     /// <summary>
     /// Extension methods to add behavios which EF Core still haven't implemented on its official API.
     /// </summary>
-    public static class EFCoreExtensions
+    internal static class EFCoreExtensions
     {
         /// <summary>
         /// Finds an entity by its ID.

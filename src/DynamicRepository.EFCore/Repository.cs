@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Collections;
 using Microsoft.EntityFrameworkCore;
 using DynamicRepository.Filter;
-using LinqKit.Core;
 using DynamicRepository.Extensions;
 
 namespace DynamicRepository.EFCore

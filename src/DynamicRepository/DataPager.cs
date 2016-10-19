@@ -10,7 +10,6 @@ using DynamicRepository.Extensions;
 using System.Linq.Dynamic.Core;
 using LinqKit;
 using System.Globalization;
-using LinqKit.Core;
 
 namespace DynamicRepository
 {
