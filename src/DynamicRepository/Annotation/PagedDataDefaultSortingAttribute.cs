@@ -9,9 +9,9 @@ namespace DynamicRepository.Annotation
     /// This attribute sets the default sorting property of the paged data search result.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public sealed class PagedDataSortingAttribute : Attribute
+    public sealed class PagedDataDefaultSortingAttribute : Attribute
     {
-        public PagedDataSortingAttribute(string property, bool isAscending = false)
+        public PagedDataDefaultSortingAttribute(string property, bool isAscending = true)
         {
             this.Property = property;
             this.IsAscending = isAscending;

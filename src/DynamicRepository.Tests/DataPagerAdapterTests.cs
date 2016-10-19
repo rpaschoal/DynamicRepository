@@ -82,5 +82,24 @@ namespace DynamicRepository.Tests
             Assert.True(transformedSettings.Sorting.Where(x => x.Property == "BackEndFirstProperty").Any());
             Assert.True(transformedSettings.Sorting.Where(x => x.Property == "BackEndSecondProperty").Any());
         }
+
+        [Fact]
+        [PagedDataDefaultSorting("MyDefaultSortingProperty", false)]
+        public void ShouldSetDefaultSortingByAttributes()
+        {
+            // Arrange
+            var items = MockModel.ArrangeFixture();
+
+            var settings = new PagedDataSettings()
+            {
+            };
+
+            // Act
+            var transformedSettings = DataPagerAdapter.TransformSettings(settings, this.GetType().GetMethod(nameof(ShouldSetDefaultSortingByAttributes)));
+
+            // Assert
+            Assert.Equal(transformedSettings.Sorting.Count, 1);
+            Assert.True(transformedSettings.Sorting.Where(x => x.Property == "MyDefaultSortingProperty").Any());
+        }
     }
 }

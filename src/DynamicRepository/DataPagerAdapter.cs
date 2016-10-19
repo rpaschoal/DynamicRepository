@@ -18,7 +18,7 @@ namespace DynamicRepository
     {
         /// <summary>
         /// This method translates a <see cref="PagedDataSettings"/> payload to another configured instance based on
-        /// any <see cref="PagedDataFilterAttribute"/> or <see cref="PagedDataSortingAttribute"/>
+        /// any <see cref="PagedDataFilterAttribute"/> or <see cref="PagedDataDefaultSortingAttribute"/>
         /// that may have been applied to a controller method.
         /// </summary>
         /// <param name="settings">
@@ -42,7 +42,7 @@ namespace DynamicRepository
             //MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
 
             var props = callingMethodInfo.GetCustomAttributes<PagedDataFilterAttribute>();
-            var sorting = callingMethodInfo.GetCustomAttribute<PagedDataSortingAttribute>();
+            var sorting = callingMethodInfo.GetCustomAttribute<PagedDataDefaultSortingAttribute>();
 
             // Checks if the consumer of the search wants to filter in ALL fields.
             if (settings.Filter.Where(x => x.Property.ToUpper() == PagedDataSettings.FILTERALLIDENTIFIER).Any())
@@ -132,7 +132,7 @@ namespace DynamicRepository
             settings.Filter = settings.Filter.Concat(otherFilters).ToList();
         }
 
-        private static void TranslateDefaultSorting(PagedDataSortingAttribute sortingAttribute, PagedDataSettings settings)
+        private static void TranslateDefaultSorting(PagedDataDefaultSortingAttribute sortingAttribute, PagedDataSettings settings)
         {
             if (settings.Sorting == null || settings.Sorting.Count == 0)
             {
