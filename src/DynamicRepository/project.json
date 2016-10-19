@@ -5,7 +5,7 @@
   "version": "1.1.2-*",
 
   "packOptions": {
-    "summary": "Dynamic repository base package for repository pattern contracts and the advanced IQueryable search engine. Use the DynamicRepository.EF, DynamicRepository.Core or DynamicRepository.MongoDB in your project.",
+    "summary": "Dynamic repository base package for repository pattern contracts and the advanced IQueryable search engine. Use the DynamicRepository.EF, DynamicRepository.EFCore or DynamicRepository.MongoDB in your project.",
     "tags": [ "repository", "pattern", "dynamic", "core" ],
     "owners": [ "Rafael Carvalho" ],
     "repository": {
