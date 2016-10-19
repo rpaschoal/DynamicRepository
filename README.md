@@ -154,7 +154,7 @@ To do so, simply override the "AddPreConditionsPagedDataFilters" method within e
 ```cs
 protected override Expression<Func<MyEntity, bool>> AddPreConditionsPagedDataFilters(PagedDataSettings settings)
 {
-  return x => x.MyProperty == "Whatever You Want"
+  return x => x.MyProperty == "Whatever You Want";
 }
 ```
 
@@ -167,7 +167,7 @@ If you need to apply rules to the result set but they need to be appended among 
 ```cs
 protected override Expression<Func<MyEntity, bool>> AddExtraPagedDataFilters(PagedDataSettings settings)
 {
-  return x => x.MyProperty == "Whatever You Want"
+  return x => x.MyProperty == "Whatever You Want";
 }
 ```
 
