@@ -179,7 +179,6 @@ The "settings" payload is available at this context and you can read all setting
 
 This project was implemented on top of these dependencies:
 
-* https://github.com/kahanu/System.Linq.Dynamic
 * https://github.com/StefH/System.Linq.Dynamic.Core
 * https://github.com/scottksmith95/LINQKit
 
