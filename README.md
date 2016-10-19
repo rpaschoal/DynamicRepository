@@ -58,7 +58,7 @@ Follow the next steps to configure the DynamicRepository on your ASP NET Core pr
 On your project.json file, add DynamicRepository to your package dependencies (Core if you are on CoreCLR, or .NET if you are on CLR).
 
 ```cs
-"DynamicRepository.Core": "1.1.0-*"
+"DynamicRepository.Core": "1.1.2-*"
 ```
 
 ### Implementation
