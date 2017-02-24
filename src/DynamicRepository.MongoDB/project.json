@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.1.0-*",
+  "version": "0.1.1-*",
 
   "packOptions": {
     "summary": "Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects using MongoDB.",
@@ -15,9 +15,9 @@
 
   "dependencies": {
     "DynamicRepository": "1.1.2-*",
-    "mongocsharpdriver": "2.3.0-beta1",
-    "MongoDB.Driver": "2.3.0-beta1",
-    "MongoDB.Driver.Core": "2.3.0-beta1"
+    "mongocsharpdriver": "2.4.2",
+    "MongoDB.Driver": "2.4.2",
+    "MongoDB.Driver.Core": "2.4.2"
   },
 
   "frameworks": {
@@ -27,5 +27,11 @@
         "portable-net45+win8"
       ]
     }
+  },
+
+  "scripts": {
+    "postcompile": [
+      "dotnet pack --no-build --configuration %compile:Configuration%"
+    ]
   }
 }
