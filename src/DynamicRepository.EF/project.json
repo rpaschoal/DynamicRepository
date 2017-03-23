@@ -2,7 +2,7 @@
   "title": "DynamicRepository.EF",
   "copyright": "Rafael Carvalho",
   "description": "https://github.com/rpaschoal/DynamicRepository",
-  "version": "1.1.2-*",
+  "version": "1.1.3-*",
 
   "packOptions": {
     "summary": "Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects using EF6.",
