@@ -28,12 +28,12 @@ namespace DynamicRepository.MongoDB
         /// <summary>
         /// The mongoDB database instance to access the desired collection for this repository.
         /// </summary>
-        IMongoDatabase _mongoDatabase;
+        private IMongoDatabase _mongoDatabase;
 
         /// <summary>
         /// Current MongoDB collection being used by this Repository instance.
         /// </summary>
-        private IMongoCollection<Entity> _collection;
+        protected IMongoCollection<Entity> Collection;
 
         /// <summary>
         /// The name of the MongoDB collection where the data for this entity is stored.
@@ -49,7 +49,7 @@ namespace DynamicRepository.MongoDB
         public Repository(IMongoDatabase mongoDatabase)
         {
             _mongoDatabase = mongoDatabase;
-            _collection = _mongoDatabase.GetCollection<Entity>(this.CollectionName);
+            Collection = _mongoDatabase.GetCollection<Entity>(this.CollectionName);
 
             _dataPager = new DataPagerMongoDB<Key, Entity>();
         }
@@ -76,7 +76,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public Entity Get(Key id)
         {
-            return (_collection.Find(GetIdFilter(id))).FirstOrDefault();
+            return (Collection.Find(GetIdFilter(id))).FirstOrDefault();
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace DynamicRepository.MongoDB
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public void Insert(Entity entity)
         {
-            _collection.InsertOne(entity);
+            Collection.InsertOne(entity);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public void Update(Entity entityToUpdate)
         {
-            _collection.ReplaceOne(GetIdFilter(entityToUpdate), entityToUpdate);
+            Collection.ReplaceOne(GetIdFilter(entityToUpdate), entityToUpdate);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace DynamicRepository.MongoDB
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public void Delete(Key id)
         {
-            _collection.DeleteOne(GetIdFilter(id));
+            Collection.DeleteOne(GetIdFilter(id));
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
-            _collection.DeleteOne(GetIdFilter(entityToDelete));
+            Collection.DeleteOne(GetIdFilter(entityToDelete));
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
-            return _collection.AsQueryable().ToList();
+            return Collection.AsQueryable().ToList();
         }
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
@@ -136,7 +136,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Collection of filtered items result.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataPager.GetPagedData(_collection.AsQueryable(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
+            return _dataPager.GetPagedData(Collection.AsQueryable(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
         }
 
         /// <summary>

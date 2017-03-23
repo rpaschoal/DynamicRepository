@@ -98,6 +98,7 @@ namespace DynamicRepository
         /// <returns>Expression to be embedded to the IQueryable filter instance.</returns>
         protected virtual Expression<Func<Entity, bool>> DefaultPagedDataFilter(PagedDataSettings settings)
         {
+            bool hasErrors = false; // Identifies if one of the parameters had wrong data 
             bool firstExecution = true;
             var queryLinq = string.Empty;
             // Holds Parameters values per index of this list (@0, @1, @2, etc).
@@ -132,6 +133,12 @@ namespace DynamicRepository
                                     // Successfully casted the value to a datetime.
                                     queryLinq += (firstExecution ? string.Empty : " " + pFilter.Conjunction + " ") + "DbFunctions.TruncateTime(" + pFilter.Property + nullableValueOperator + ") == @" + paramValues.Count;
                                     paramValues.Add(castedDateTime.Date);
+                                    firstExecution = false;
+                                }
+                                else
+                                {
+                                    hasErrors = true;
+                                    break;
                                 }
                             }
                             else
@@ -145,10 +152,10 @@ namespace DynamicRepository
                                 {
                                     queryLinq += (firstExecution ? string.Empty : " " + pFilter.Conjunction + " ") + pFilter.Property + nullableValueOperator + ".ToString().ToUpper().Contains(@" + paramValues.Count + ")";
                                 }
-                            }
 
-                            paramValues.Add(pFilter.Value.ToUpper());
-                            firstExecution = false;
+                                paramValues.Add(pFilter.Value.ToUpper());
+                                firstExecution = false;
+                            }
                         }
                         else
                         {
@@ -165,6 +172,12 @@ namespace DynamicRepository
                                     // Successfully casted the value to a datetime.
                                     queryLinq += (firstExecution ? string.Empty : " " + pFilter.Conjunction + " ") + navigationPropertyCollection + ".Where(DbFunctions.TruncateTime(" + pFilter.Property.Remove(0, navigationPropertyCollection.Length + 1) + nullableValueOperator + ") == @" + paramValues.Count + ").Count() > 0";
                                     paramValues.Add(castedDateTime.Date);
+                                    firstExecution = false;
+                                }
+                                else
+                                {
+                                    hasErrors = true;
+                                    break;
                                 }
                             }
                             else
@@ -179,16 +192,18 @@ namespace DynamicRepository
                                 }
 
                                 paramValues.Add(pFilter.Value.ToUpper());
+                                firstExecution = false;
                             }
-
-                            firstExecution = false;
                         }
                     }
                 }
             }
 
             // Returns current default query as expression.
-            return queryLinq.ParseLambda<Entity>(paramValues.ToArray());
+            if (!hasErrors)
+                return queryLinq.ParseLambda<Entity>(paramValues.ToArray());
+            else
+                return "1 != 1".ParseLambda<Entity>(null); //Invalidates the result set
         }
 
         /// <summary>
