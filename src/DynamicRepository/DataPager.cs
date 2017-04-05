@@ -200,7 +200,7 @@ namespace DynamicRepository
             }
 
             // Returns current default query as expression.
-            if (!hasErrors)
+            if (!hasErrors || settings.SearchInALL)
                 return queryLinq.ParseLambda<Entity>(paramValues.ToArray());
             else
                 return "1 != 1".ParseLambda<Entity>(null); //Invalidates the result set
