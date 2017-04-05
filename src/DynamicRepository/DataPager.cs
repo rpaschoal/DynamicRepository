@@ -70,7 +70,7 @@ namespace DynamicRepository
 
                 // Adds composed filter to the query here (This is the default filter inspector bult-in for the search).
                 // This is a merge result from default query engine + customized queries from devs (ExtraPagedDataFilter method).
-                pagedDataQuery = pagedDataQuery.Where(MergeFilters(settings, DefaultPagedDataFilter(settings), ExtraPagedDataFilter, settings.SearchInALL));
+                pagedDataQuery = pagedDataQuery.AsExpandable().Where(MergeFilters(settings, DefaultPagedDataFilter(settings), ExtraPagedDataFilter, settings.SearchInALL));
 
                 // Adds sorting capabilities
                 pagedDataQuery = this.AddSorting(pagedDataQuery, settings);
