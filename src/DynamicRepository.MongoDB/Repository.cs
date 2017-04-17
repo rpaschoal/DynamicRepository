@@ -55,6 +55,19 @@ namespace DynamicRepository.MongoDB
         }
 
         /// <summary>
+        /// Gets a collection by its name from the current <see cref="_mongoDatabase"/>. Useful for JOIN operations.
+        /// </summary>
+        /// <typeparam name="T">The type of the entity stored by the desired collection to be retrieved.</typeparam>
+        /// <param name="collectionName">The name of the collection to be retrieved.</param>
+        /// <returns>
+        /// Instance of <see cref="IMongoCollection{TDocument}"/>.
+        /// </returns>
+        public IMongoCollection<T> GetCollection<T>(string collectionName) where T : class
+        {
+            return _mongoDatabase.GetCollection<T>(collectionName);
+        }
+
+        /// <summary>
         /// Gets underline Id filter for mongoDB.
         /// </summary>
         protected abstract FilterDefinition<Entity> GetIdFilter(Entity entity);
