@@ -1,6 +1,6 @@
 # DynamicRepository
 
-Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects for EF6 (CoreCLR and .NET Framework 4.5.1), EF Core or MongoDB. 
+Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects using EF6 (CoreCLR and .NET Framework 4.5.1), EF Core or MongoDB. 
 
 With this package you get instant full CRUD data access for your project + advanced filtering methods with almost no additional code.
 
