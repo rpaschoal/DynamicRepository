@@ -201,13 +201,9 @@ namespace DynamicRepository.EFCore
                 query = query.Where(filter);
             }
 
-            // TODO => Implement this when possible.
             foreach (var includeProperty in includeProperties)
             {
-                // EF Team still didn't add this feature.
-                // http://stackoverflow.com/questions/27634229/dbset-include-operator-for-ef7-accepting-string-path
-                throw new NotImplementedException();
-                //query = query.Include(includeProperty);
+                query = query.Include(includeProperty);
             }
 
             if (orderBy != null)
