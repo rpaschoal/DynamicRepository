@@ -82,6 +82,11 @@ namespace DynamicRepository
         IEnumerable<Entity> ListAll();
 
         /// <summary>
+        /// Gets a queryable instance of the current data set.
+        /// </summary>
+        IQueryable<Entity> GetQueryable();
+
+        /// <summary>
         /// Filter, order and join the current entity based on criterias supplied as parameters.
         /// </summary>
         /// <param name="filter">Expression which supplies all desired filters.</param>

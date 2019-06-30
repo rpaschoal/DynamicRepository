@@ -179,6 +179,14 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
+            return GetQueryable();
+        }
+
+        /// <summary>
+        /// Gets a queryable instance of the current data set.
+        /// </summary>
+        public IQueryable<Entity> GetQueryable()
+        {
             return Collection.AsQueryable();
         }
 

@@ -179,7 +179,15 @@ namespace DynamicRepository.EF
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
-            return this.DbSet;
+            return GetQueryable();
+        }
+
+        /// <summary>
+        /// Gets a queryable instance of the current data set.
+        /// </summary>
+        public IQueryable<Entity> GetQueryable()
+        {
+            return this.DbSet.AsQueryable();
         }
 
         /// <summary>
