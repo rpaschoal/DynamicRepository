@@ -192,8 +192,21 @@ namespace DynamicRepository.MongoDB
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
         {
-            // TODO: Have a look on this later... Won't be implemented for 1.1.0
-            throw new NotImplementedException();
+            IQueryable<Entity> query = GetQueryable();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (orderBy != null)
+            {
+                return orderBy(query).ToList();
+            }
+            else
+            {
+                return query.ToList();
+            }
         }
 
         /// <summary>

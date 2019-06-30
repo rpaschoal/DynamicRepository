@@ -48,15 +48,6 @@ namespace DynamicRepository.EFCore
         }
 
         /// <summary>
-        /// Returns an instance of non-filtered IQueryable of all items in a DBSet.
-        /// </summary>
-        /// <returns>IQueryable instance of type <see cref="Entity"/></returns>
-        internal virtual IQueryable<Entity> List()
-        {
-            return DbSet;
-        }
-
-        /// <summary>
         /// Gets an entity instance based on its <see cref="Key"/>.
         /// </summary>
         /// <param name="key">The desired entity key value.</param>
@@ -203,7 +194,7 @@ namespace DynamicRepository.EFCore
             Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null,
             params string[] includeProperties)
         {
-            IQueryable<Entity> query = DbSet;
+            IQueryable<Entity> query = GetQueryable();
 
             if (filter != null)
             {
@@ -247,7 +238,7 @@ namespace DynamicRepository.EFCore
         /// <returns>Filled PagedData instance.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataSourcePager.GetPagedData((IQueryable<Entity>)this.List(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
+            return _dataSourcePager.GetPagedData(GetQueryable(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
         }
 
         /// <summary>
