@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{11DC60F0-490B-4F8C-A877-5A0023C8B593}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicRepository", "DynamicRepository\DynamicRepository.csproj", "{477E1E98-1D63-4150-884E-C3CDE552D7E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicRepository.EFCore", "DynamicRepository.EFCore\DynamicRepository.EFCore.csproj", "{D6E0F458-4B02-450A-85DF-296B670F2F8F}"
@@ -44,13 +42,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{477E1E98-1D63-4150-884E-C3CDE552D7E0} = {11DC60F0-490B-4F8C-A877-5A0023C8B593}
-		{D6E0F458-4B02-450A-85DF-296B670F2F8F} = {11DC60F0-490B-4F8C-A877-5A0023C8B593}
-		{97924819-8B62-4DCF-A1F6-C6A133F8374E} = {11DC60F0-490B-4F8C-A877-5A0023C8B593}
-		{BDAB2705-3C20-42A3-BEDF-F67DCFD54CB9} = {11DC60F0-490B-4F8C-A877-5A0023C8B593}
-		{37056BF7-F7E6-4A5E-ACC7-351B296148A5} = {11DC60F0-490B-4F8C-A877-5A0023C8B593}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3BCF826F-081D-4A42-8CE8-A460E4F02EAC}
