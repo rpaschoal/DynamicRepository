@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.2.0</Version>
+    <Authors>Rafael Carvalho</Authors>
+    <PackageProjectUrl>https://github.com/rpaschoal/DynamicRepository</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

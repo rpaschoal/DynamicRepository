@@ -1,9 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <Version>1.2.0</Version>
+
+    <Authors>Rafael Carvalho</Authors>
+
+    <PackageProjectUrl>https://github.com/rpaschoal/DynamicRepository</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
