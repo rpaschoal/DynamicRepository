@@ -43,7 +43,7 @@ namespace DynamicRepository.MongoDB
         /// <summary>
         /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
         /// </summary>
-        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
+        private Expression<Func<Entity, bool>> GlobalFilter { get; set; } = x => true;
 
         /// <summary>
         /// Adds a global filter expression to all operations which query for data.
@@ -51,7 +51,7 @@ namespace DynamicRepository.MongoDB
         /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
         public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
         {
-            this.GlobalFilter = filter;
+            GlobalFilter = filter;
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace DynamicRepository.MongoDB
         public Repository(IMongoDatabase mongoDatabase)
         {
             _mongoDatabase = mongoDatabase;
-            Collection = _mongoDatabase.GetCollection<Entity>(this.CollectionName);
+            Collection = GetCollection<Entity>(CollectionName);
 
             _dataPager = new DataPagerMongoDB<Key, Entity>();
         }
@@ -103,7 +103,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public Entity Get(Key id)
         {
-            return (Collection.Find(GetIdFilter(id))).FirstOrDefault();
+            return new[] { Collection.Find(GetIdFilter(id)).FirstOrDefault() }.AsQueryable().FirstOrDefault(GlobalFilter);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public async Task<Entity> GetAsync(Key id)
         {
-            return (await Collection.FindAsync(GetIdFilter(id))).FirstOrDefault();
+            return new[] { await (await Collection.FindAsync(GetIdFilter(id))).FirstOrDefaultAsync() }.AsQueryable().FirstOrDefault(GlobalFilter);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return Collection.AsQueryable().Where(this.GlobalFilter);
+            return Collection.AsQueryable().Where(GlobalFilter);
         }
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
@@ -230,7 +230,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Collection of filtered items result.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataPager.GetPagedData(Collection.AsQueryable(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
+            return _dataPager.GetPagedData(GetQueryable(), settings, AddPreConditionsPagedDataFilter(settings), AddExtraPagedDataFilter(settings));
         }
 
         /// <summary>

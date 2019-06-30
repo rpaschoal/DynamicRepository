@@ -34,7 +34,7 @@ namespace DynamicRepository.EFCore
         /// <summary>
         /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
         /// </summary>
-        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
+        private Expression<Func<Entity, bool>> GlobalFilter { get; set; } = x => true;
 
         /// <summary>
         /// Adds a global filter expression to all operations which query for data.
@@ -42,7 +42,7 @@ namespace DynamicRepository.EFCore
         /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
         public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
         {
-            this.GlobalFilter = filter;
+            GlobalFilter = filter;
         }
 
         /// <summary>
@@ -71,11 +71,11 @@ namespace DynamicRepository.EFCore
             if (key is Array)
             {
                 // This is to handle entity framework find by composite key
-                return DbSet.Find(Context, (key as IEnumerable).Cast<object>().ToArray());
+                return new[] { DbSet.Find((key as IEnumerable).Cast<object>().ToArray()) }.AsQueryable().FirstOrDefault(GlobalFilter);
             }
             else
             {
-                return DbSet.Find(Context, key);
+                return new[] { DbSet.Find(key) }.AsQueryable().FirstOrDefault(GlobalFilter);
             }
         }
 
@@ -84,16 +84,16 @@ namespace DynamicRepository.EFCore
         /// </summary>
         /// <param name="key">The desired entity key value.</param>
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
-        public virtual Task<Entity> GetAsync(Key key)
+        public virtual async Task<Entity> GetAsync(Key key)
         {
             if (key is Array)
             {
                 // This is to handle entity framework find by composite key
-                return DbSet.FindAsync(Context, (key as IEnumerable).Cast<object>().ToArray());
+                return await new[] { await DbSet.FindAsync((key as IEnumerable).Cast<object>().ToArray()) }.AsQueryable().FirstOrDefaultAsync(predicate: GlobalFilter);
             }
             else
             {
-                return DbSet.FindAsync(Context, key);
+                return await new[] { await DbSet.FindAsync(key) }.AsQueryable().FirstOrDefaultAsync(GlobalFilter);
             }
         }
 
@@ -139,7 +139,7 @@ namespace DynamicRepository.EFCore
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public virtual void Delete(Key id)
         {
-            Delete(this.Get(id));
+            Delete(Get(id));
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace DynamicRepository.EFCore
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public virtual Task DeleteAsync(Key id)
         {
-            return Task.Run(async () => DeleteAsync(await this.GetAsync(id)));
+            return Task.Run(async () => DeleteAsync(await GetAsync(id)));
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace DynamicRepository.EFCore
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return this.DbSet.AsQueryable().Where(this.GlobalFilter);
+            return DbSet.AsQueryable().Where(GlobalFilter);
         }
 
         /// <summary>
@@ -231,24 +231,13 @@ namespace DynamicRepository.EFCore
         }
 
         /// <summary>
-        /// Returns <see cref="IQueryable"/> for consumers to shape queries as they need to.
-        /// </summary>
-        /// <returns>
-        /// Plain DbSet as Queryable.
-        /// </returns>
-        protected internal IQueryable<Entity> AsQueryable()
-        {
-            return DbSet.AsQueryable();
-        }
-
-        /// <summary>
         /// Returns a collection of data results that can be paged.
         /// </summary>
         /// <param name="settings">Settings for the search.</param>
         /// <returns>Filled PagedData instance.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataSourcePager.GetPagedData(GetQueryable(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
+            return _dataSourcePager.GetPagedData(GetQueryable(), settings, AddPreConditionsPagedDataFilter(settings), AddExtraPagedDataFilter(settings));
         }
 
         /// <summary>
