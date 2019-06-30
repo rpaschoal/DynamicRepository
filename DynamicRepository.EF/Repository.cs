@@ -36,7 +36,7 @@ namespace DynamicRepository.EF
         /// <summary>
         /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
         /// </summary>
-        private Expression<Func<Entity, bool>> GlobalFilter { get; set; } = x => true;
+        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
 
         /// <summary>
         /// Adds a global filter expression to all operations which query for data.
@@ -70,15 +70,19 @@ namespace DynamicRepository.EF
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public virtual Entity Get(Key key)
         {
+            Entity queriedEntity;
+
             if (key is Array)
             {
                 // This is to handle entity framework find by composite key
-                return new[] { DbSet.Find((key as IEnumerable).Cast<object>().ToArray()) }.AsQueryable().FirstOrDefault(GlobalFilter);
+                queriedEntity = DbSet.Find((key as IEnumerable).Cast<object>().ToArray());
             }
             else
             {
-                return new[] { DbSet.Find(key) }.AsQueryable().FirstOrDefault(GlobalFilter);
+                queriedEntity = DbSet.Find(key);
             }
+
+            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -88,15 +92,19 @@ namespace DynamicRepository.EF
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public virtual async Task<Entity> GetAsync(Key key)
         {
+            Entity queriedEntity;
+
             if (key is Array)
             {
                 // This is to handle entity framework find by composite key
-                return await new[] { await DbSet.FindAsync((key as IEnumerable).Cast<object>().ToArray()) }.AsQueryable().FirstOrDefaultAsync(predicate: GlobalFilter);
+                queriedEntity = await DbSet.FindAsync((key as IEnumerable).Cast<object>().ToArray());
             }
             else
             {
-                return await new[] { await DbSet.FindAsync(key) }.AsQueryable().FirstOrDefaultAsync(GlobalFilter);
+                queriedEntity = await DbSet.FindAsync(key);
             }
+
+            return GlobalFilter != null ? await new[] { queriedEntity }.AsQueryable().FirstOrDefaultAsync(GlobalFilter) :  queriedEntity;
         }
 
         /// <summary>

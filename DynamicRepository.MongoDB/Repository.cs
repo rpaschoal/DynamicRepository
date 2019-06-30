@@ -43,7 +43,7 @@ namespace DynamicRepository.MongoDB
         /// <summary>
         /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
         /// </summary>
-        private Expression<Func<Entity, bool>> GlobalFilter { get; set; } = x => true;
+        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
 
         /// <summary>
         /// Adds a global filter expression to all operations which query for data.
@@ -103,7 +103,9 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public Entity Get(Key id)
         {
-            return new[] { Collection.Find(GetIdFilter(id)).FirstOrDefault() }.AsQueryable().FirstOrDefault(GlobalFilter);
+            var queriedEntity = Collection.Find(GetIdFilter(id)).FirstOrDefault();
+
+            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -113,7 +115,9 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public async Task<Entity> GetAsync(Key id)
         {
-            return new[] { await (await Collection.FindAsync(GetIdFilter(id))).FirstOrDefaultAsync() }.AsQueryable().FirstOrDefault(GlobalFilter);
+            var queriedEntity = await (await Collection.FindAsync(GetIdFilter(id))).FirstOrDefaultAsync();
+
+            return GlobalFilter != null ? new [] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
