@@ -34,6 +34,20 @@ namespace DynamicRepository.EF
         protected internal DbSet<Entity> DbSet;
 
         /// <summary>
+        /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
+        /// </summary>
+        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
+
+        /// <summary>
+        /// Adds a global filter expression to all operations which query for data.
+        /// </summary>
+        /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
+        public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
+        {
+            this.GlobalFilter = filter;
+        }
+
+        /// <summary>
         /// Default constructor of main repository. 
         /// Required dependencies are injected.
         /// </summary>
@@ -178,7 +192,7 @@ namespace DynamicRepository.EF
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return this.DbSet.AsQueryable();
+            return this.DbSet.AsQueryable().Where(this.GlobalFilter);
         }
 
         /// <summary>

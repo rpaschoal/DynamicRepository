@@ -15,6 +15,12 @@ namespace DynamicRepository
     public interface IRepository<Key, Entity> where Entity : class
     {
         /// <summary>
+        /// Adds a global filter expression to all operations which query for data.
+        /// </summary>
+        /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
+        void HasGlobalFilter(Expression<Func<Entity, bool>> filter);
+
+        /// <summary>
         /// Gets an entity instance based on its <see cref="Key"/>.
         /// </summary>
         /// <param name="key">The desired entity key value.</param>

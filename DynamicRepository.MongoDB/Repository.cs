@@ -41,6 +41,20 @@ namespace DynamicRepository.MongoDB
         protected abstract string CollectionName { get; }
 
         /// <summary>
+        /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
+        /// </summary>
+        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
+
+        /// <summary>
+        /// Adds a global filter expression to all operations which query for data.
+        /// </summary>
+        /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
+        public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
+        {
+            this.GlobalFilter = filter;
+        }
+
+        /// <summary>
         /// Default constructor of this Repository.
         /// </summary>
         /// <param name="mongoDatabase">
@@ -187,7 +201,7 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return Collection.AsQueryable();
+            return Collection.AsQueryable().Where(this.GlobalFilter);
         }
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
