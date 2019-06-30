@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace DynamicRepository
 {
@@ -21,16 +22,35 @@ namespace DynamicRepository
         Entity Get(Key id);
 
         /// <summary>
+        /// Gets an entity instance based on its <see cref="Key"/>.
+        /// </summary>
+        /// <param name="key">The desired entity key value.</param>
+        /// <returns>Persisted entity if found, otherwise NULL.</returns>
+        Task<Entity> GetAsync(Key id);
+
+        /// <summary>
         /// Persists a new entity model.
         /// </summary>
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         void Insert(Entity entity);
 
         /// <summary>
+        /// Persists a new entity model.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
+        Task InsertAsync(Entity entity);
+
+        /// <summary>
         /// Updates an existing persisted entity.
         /// </summary>
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         void Update(Entity entityToUpdate);
+
+        /// <summary>
+        /// Updates an existing persisted entity.
+        /// </summary>
+        /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
+        Task UpdateAsync(Entity entityToUpdate);
 
         /// <summary>
         /// Deletes an existing entity.
@@ -41,8 +61,20 @@ namespace DynamicRepository
         /// <summary>
         /// Deletes an existing entity.
         /// </summary>
+        /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
+        Task DeleteAsync(Key id);
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         void Delete(Entity entityToDelete);
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
+        Task DeleteAsync(Entity entityToDelete);
 
         /// <summary>
         /// Returns all entries of this entity.

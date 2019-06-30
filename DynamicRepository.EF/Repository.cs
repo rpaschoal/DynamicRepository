@@ -10,6 +10,7 @@ using LinqKit;
 using DynamicRepository.Extensions;
 using System.Data.Entity;
 using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace DynamicRepository.EF
 {
@@ -76,12 +77,39 @@ namespace DynamicRepository.EF
         }
 
         /// <summary>
+        /// Gets an entity instance based on its <see cref="Key"/>.
+        /// </summary>
+        /// <param name="key">The desired entity key value.</param>
+        /// <returns>Persisted entity if found, otherwise NULL.</returns>
+        public virtual Task<Entity> GetAsync(Key key)
+        {
+            if (key is Array)
+            {
+                // This is to handle entity framework find by composite key
+                return DbSet.FindAsync((key as IEnumerable).Cast<object>().ToArray());
+            }
+            else
+            {
+                return DbSet.FindAsync(key);
+            }
+        }
+
+        /// <summary>
         /// Persists a new entity model.
         /// </summary>
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual void Insert(Entity entity)
         {
             DbSet.Add(entity);
+        }
+
+        /// <summary>
+        /// Persists a new entity model.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
+        public virtual Task InsertAsync(Entity entity)
+        {
+            return Task.Run(() => DbSet.Add(entity));
         }
 
         /// <summary>
@@ -94,12 +122,30 @@ namespace DynamicRepository.EF
         }
 
         /// <summary>
+        /// Updates an existing persisted entity.
+        /// </summary>
+        /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
+        public virtual Task UpdateAsync(Entity entityToUpdate)
+        {
+            return Task.Run(() => Context.Entry(entityToUpdate).State = EntityState.Modified);
+        }
+
+        /// <summary>
         /// Deletes an existing entity.
         /// </summary>
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public virtual void Delete(Key id)
         {
             Delete(this.Get(id));
+        }
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
+        public virtual Task DeleteAsync(Key id)
+        {
+            return Task.Run(async () => DeleteAsync(await this.GetAsync(id)));
         }
 
         /// <summary>
@@ -115,11 +161,25 @@ namespace DynamicRepository.EF
         }
 
         /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
+        public Task DeleteAsync(Entity entityToDelete)
+        {
+            if (entityToDelete != null)
+            {
+                return Task.Run(() => DbSet.Remove(entityToDelete));
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Returns all entries of this entity.
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
-            return this.DbSet.ToList();
+            return this.DbSet;
         }
 
         /// <summary>

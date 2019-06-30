@@ -93,6 +93,16 @@ namespace DynamicRepository.MongoDB
         }
 
         /// <summary>
+        /// Gets an entity instance based on its <see cref="Key"/>.
+        /// </summary>
+        /// <param name="key">The desired entity key value.</param>
+        /// <returns>Persisted entity if found, otherwise NULL.</returns>
+        public async Task<Entity> GetAsync(Key id)
+        {
+            return (await Collection.FindAsync(GetIdFilter(id))).FirstOrDefault();
+        }
+
+        /// <summary>
         /// Persists a new entity model.
         /// </summary>
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
@@ -102,12 +112,30 @@ namespace DynamicRepository.MongoDB
         }
 
         /// <summary>
+        /// Persists a new entity model.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
+        public Task InsertAsync(Entity entity)
+        {
+            return Collection.InsertOneAsync(entity);
+        }
+
+        /// <summary>
         /// Updates an existing persisted entity.
         /// </summary>
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public void Update(Entity entityToUpdate)
         {
             Collection.ReplaceOne(GetIdFilter(entityToUpdate), entityToUpdate);
+        }
+
+        /// <summary>
+        /// Updates an existing persisted entity.
+        /// </summary>
+        /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
+        public Task UpdateAsync(Entity entityToUpdate)
+        {
+            return Collection.ReplaceOneAsync(GetIdFilter(entityToUpdate), entityToUpdate);
         }
 
         /// <summary>
@@ -122,6 +150,15 @@ namespace DynamicRepository.MongoDB
         /// <summary>
         /// Deletes an existing entity.
         /// </summary>
+        /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
+        public Task DeleteAsync(Key id)
+        {
+            return Collection.DeleteOneAsync(GetIdFilter(id));
+        }
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
@@ -129,11 +166,20 @@ namespace DynamicRepository.MongoDB
         }
 
         /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
+        public Task DeleteAsync(Entity entityToDelete)
+        {
+            return Collection.DeleteOneAsync(GetIdFilter(entityToDelete));
+        }
+
+        /// <summary>
         /// Returns all entries of this entity.
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
-            return Collection.AsQueryable().ToList();
+            return Collection.AsQueryable();
         }
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
