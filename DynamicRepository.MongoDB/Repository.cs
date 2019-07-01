@@ -205,7 +205,7 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return Collection.AsQueryable().Where(GlobalFilter);
+            return GlobalFilter != null ? Collection.AsQueryable().Where(GlobalFilter) : Collection.AsQueryable();
         }
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)

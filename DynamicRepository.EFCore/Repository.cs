@@ -198,7 +198,7 @@ namespace DynamicRepository.EFCore
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return DbSet.AsQueryable().Where(GlobalFilter);
+            return GlobalFilter != null ? DbSet.AsQueryable().Where(GlobalFilter) : DbSet.AsQueryable();
         }
 
         /// <summary>
