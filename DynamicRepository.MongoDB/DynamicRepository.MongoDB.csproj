@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.2.0</Version>
+    <Authors>Rafael Carvalho</Authors>
+    <Description></Description>
+    <PackageProjectUrl>https://github.com/rpaschoal/DynamicRepository</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.8.1" />
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DynamicRepository\DynamicRepository.csproj" />
+  </ItemGroup>
+
+</Project>

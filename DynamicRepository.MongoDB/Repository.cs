@@ -41,6 +41,20 @@ namespace DynamicRepository.MongoDB
         protected abstract string CollectionName { get; }
 
         /// <summary>
+        /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
+        /// </summary>
+        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
+
+        /// <summary>
+        /// Adds a global filter expression to all operations which query for data.
+        /// </summary>
+        /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
+        public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
+        {
+            GlobalFilter = filter;
+        }
+
+        /// <summary>
         /// Default constructor of this Repository.
         /// </summary>
         /// <param name="mongoDatabase">
@@ -49,7 +63,7 @@ namespace DynamicRepository.MongoDB
         public Repository(IMongoDatabase mongoDatabase)
         {
             _mongoDatabase = mongoDatabase;
-            Collection = _mongoDatabase.GetCollection<Entity>(this.CollectionName);
+            Collection = GetCollection<Entity>(CollectionName);
 
             _dataPager = new DataPagerMongoDB<Key, Entity>();
         }
@@ -89,7 +103,21 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public Entity Get(Key id)
         {
-            return (Collection.Find(GetIdFilter(id))).FirstOrDefault();
+            var queriedEntity = Collection.Find(GetIdFilter(id)).FirstOrDefault();
+
+            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
+        }
+
+        /// <summary>
+        /// Gets an entity instance based on its <see cref="Key"/>.
+        /// </summary>
+        /// <param name="key">The desired entity key value.</param>
+        /// <returns>Persisted entity if found, otherwise NULL.</returns>
+        public async Task<Entity> GetAsync(Key id)
+        {
+            var queriedEntity = await (await Collection.FindAsync(GetIdFilter(id))).FirstOrDefaultAsync();
+
+            return GlobalFilter != null ? new [] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -102,12 +130,30 @@ namespace DynamicRepository.MongoDB
         }
 
         /// <summary>
+        /// Persists a new entity model.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
+        public Task InsertAsync(Entity entity)
+        {
+            return Collection.InsertOneAsync(entity);
+        }
+
+        /// <summary>
         /// Updates an existing persisted entity.
         /// </summary>
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public void Update(Entity entityToUpdate)
         {
             Collection.ReplaceOne(GetIdFilter(entityToUpdate), entityToUpdate);
+        }
+
+        /// <summary>
+        /// Updates an existing persisted entity.
+        /// </summary>
+        /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
+        public Task UpdateAsync(Entity entityToUpdate)
+        {
+            return Collection.ReplaceOneAsync(GetIdFilter(entityToUpdate), entityToUpdate);
         }
 
         /// <summary>
@@ -122,6 +168,15 @@ namespace DynamicRepository.MongoDB
         /// <summary>
         /// Deletes an existing entity.
         /// </summary>
+        /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
+        public Task DeleteAsync(Key id)
+        {
+            return Collection.DeleteOneAsync(GetIdFilter(id));
+        }
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
@@ -129,17 +184,47 @@ namespace DynamicRepository.MongoDB
         }
 
         /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
+        public Task DeleteAsync(Entity entityToDelete)
+        {
+            return Collection.DeleteOneAsync(GetIdFilter(entityToDelete));
+        }
+
+        /// <summary>
         /// Returns all entries of this entity.
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
-            return Collection.AsQueryable().ToList();
+            return GetQueryable();
+        }
+
+        /// <summary>
+        /// Gets a queryable instance of the current data set.
+        /// </summary>
+        public IQueryable<Entity> GetQueryable()
+        {
+            return GlobalFilter != null ? Collection.AsQueryable().Where(GlobalFilter) : Collection.AsQueryable();
         }
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
         {
-            // TODO: Have a look on this later... Won't be implemented for 1.1.0
-            throw new NotImplementedException();
+            IQueryable<Entity> query = GetQueryable();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (orderBy != null)
+            {
+                return orderBy(query).ToList();
+            }
+            else
+            {
+                return query.ToList();
+            }
         }
 
         /// <summary>
@@ -149,7 +234,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Collection of filtered items result.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataPager.GetPagedData(Collection.AsQueryable(), settings, this.AddPreConditionsPagedDataFilter(settings), this.AddExtraPagedDataFilter(settings));
+            return _dataPager.GetPagedData(GetQueryable(), settings, AddPreConditionsPagedDataFilter(settings), AddExtraPagedDataFilter(settings));
         }
 
         /// <summary>
