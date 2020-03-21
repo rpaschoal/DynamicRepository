@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
+    <PackageReference Include="Polly" Version="7.2.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.22" />
   </ItemGroup>
 
