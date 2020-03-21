@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using DynamicRepository.Filter;
 using DynamicRepository.Extensions;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace DynamicRepository.EFCore
 {
@@ -120,7 +121,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual Task InsertAsync(Entity entity)
         {
-            return DbSet.AddAsync(entity);
+            return DbSet.AddAsync(entity, CancellationToken.None).AsTask();
         }
 
         /// <summary>
@@ -154,9 +155,9 @@ namespace DynamicRepository.EFCore
         /// Deletes an existing entity.
         /// </summary>
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
-        public virtual Task DeleteAsync(Key id)
+        public virtual async Task DeleteAsync(Key id)
         {
-            return Task.Run(async () => DeleteAsync(await GetAsync(id)));
+            await DeleteAsync(await GetAsync(id));
         }
 
         /// <summary>
