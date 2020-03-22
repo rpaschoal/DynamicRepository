@@ -9,7 +9,7 @@ using Polly;
 
 namespace DynamicRepository.Resiliency
 {
-    public sealed class ResilientRepositoryDecorator<Key, Entity> : IRepository<Key, Entity> where Entity : class, new()
+    public sealed class ResilientRepositoryDecorator<Key, Entity> : IRepository<Key, Entity> where Entity : class
     {
         private const int NUMBER_OF_RETRIES = 3;
         private readonly IRepository<Key, Entity> _repository;
