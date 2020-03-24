@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DynamicRepository
+namespace DynamicRepository.AddOn
 {
     public class RepositoryAddOnBuilder<Key, Entity> where Entity : class
     {

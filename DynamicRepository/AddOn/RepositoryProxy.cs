@@ -6,20 +6,31 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicRepository
+namespace DynamicRepository.AddOn
 {
     public class RepositoryProxy<Key, Entity> : IRepository<Key, Entity> where Entity : class
     {
         private IRepository<Key, Entity> _repositoryInternals;
+        private IRepository<Key, Entity> RepositoryInternals { 
+            get
+            {
+                if (_repositoryInternals == null)
+                {
+                    throw new NullReferenceException("Proxy internals were not initialized.");
+                }
 
-        public RepositoryProxy(IRepository<Key, Entity> internals)
+                return _repositoryInternals;
+            } 
+        }
+
+        public void InitializeProxy(IRepository<Key, Entity> internals)
         {
             _repositoryInternals = internals;
         }
 
         public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
         {
-            _repositoryInternals.HasGlobalFilter(filter);
+            RepositoryInternals.HasGlobalFilter(filter);
         }
 
         /// <summary>
@@ -29,7 +40,7 @@ namespace DynamicRepository
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public virtual Entity Get(Key key)
         {
-            return _repositoryInternals.Get(key);
+            return RepositoryInternals.Get(key);
         }
 
         /// <summary>
@@ -39,7 +50,7 @@ namespace DynamicRepository
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public virtual Task<Entity> GetAsync(Key key)
         {
-            return _repositoryInternals.GetAsync(key);
+            return RepositoryInternals.GetAsync(key);
         }
 
         /// <summary>
@@ -48,7 +59,7 @@ namespace DynamicRepository
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual void Insert(Entity entity)
         {
-            _repositoryInternals.Insert(entity);
+            RepositoryInternals.Insert(entity);
         }
 
         /// <summary>
@@ -57,7 +68,7 @@ namespace DynamicRepository
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual Task InsertAsync(Entity entity)
         {
-            return _repositoryInternals.InsertAsync(entity);
+            return RepositoryInternals.InsertAsync(entity);
         }
 
         /// <summary>
@@ -66,7 +77,7 @@ namespace DynamicRepository
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public virtual void Update(Entity entityToUpdate)
         {
-            _repositoryInternals.Update(entityToUpdate);
+            RepositoryInternals.Update(entityToUpdate);
         }
 
         /// <summary>
@@ -75,7 +86,7 @@ namespace DynamicRepository
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public virtual Task UpdateAsync(Entity entityToUpdate)
         {
-            return _repositoryInternals.UpdateAsync(entityToUpdate);
+            return RepositoryInternals.UpdateAsync(entityToUpdate);
         }
 
         /// <summary>
@@ -84,7 +95,7 @@ namespace DynamicRepository
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public virtual void Delete(Key id)
         {
-            _repositoryInternals.Delete(id);
+            RepositoryInternals.Delete(id);
         }
 
         /// <summary>
@@ -93,7 +104,7 @@ namespace DynamicRepository
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public virtual Task DeleteAsync(Key id)
         {
-            return _repositoryInternals.DeleteAsync(id);
+            return RepositoryInternals.DeleteAsync(id);
         }
 
         /// <summary>
@@ -102,7 +113,7 @@ namespace DynamicRepository
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
-            _repositoryInternals.Delete(entityToDelete);
+            RepositoryInternals.Delete(entityToDelete);
         }
 
         /// <summary>
@@ -111,7 +122,7 @@ namespace DynamicRepository
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public Task DeleteAsync(Entity entityToDelete)
         {
-            return _repositoryInternals.DeleteAsync(entityToDelete);
+            return RepositoryInternals.DeleteAsync(entityToDelete);
         }
 
         /// <summary>
@@ -119,7 +130,7 @@ namespace DynamicRepository
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
-            return _repositoryInternals.ListAll();
+            return RepositoryInternals.ListAll();
         }
 
         /// <summary>
@@ -127,7 +138,7 @@ namespace DynamicRepository
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return _repositoryInternals.GetQueryable();
+            return RepositoryInternals.GetQueryable();
         }
 
         /// <summary>
@@ -145,7 +156,7 @@ namespace DynamicRepository
             Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null,
             params string[] includeProperties)
         {
-            return _repositoryInternals.List(filter, orderBy, includeProperties);
+            return RepositoryInternals.List(filter, orderBy, includeProperties);
         }
 
         /// <summary>
@@ -155,7 +166,7 @@ namespace DynamicRepository
         /// <returns>Filled PagedData instance.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _repositoryInternals.GetPagedData(settings);
+            return RepositoryInternals.GetPagedData(settings);
         }
 
         /// <summary>
