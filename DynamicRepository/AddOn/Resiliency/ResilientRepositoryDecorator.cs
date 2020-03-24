@@ -9,8 +9,8 @@ using Polly;
 
 namespace DynamicRepository.AddOn.Resiliency
 {
-    public sealed class ResilientRepositoryDecorator<Key, Entity, ExceptionType> : IRepository<Key, Entity> 
-        where Entity : class 
+    public sealed class ResilientRepositoryDecorator<Key, Entity, ExceptionType> : IRepository<Key, Entity>
+        where Entity : class
         where ExceptionType : Exception
     {
         private const int NUMBER_OF_RETRIES = 3;
@@ -19,16 +19,12 @@ namespace DynamicRepository.AddOn.Resiliency
         private readonly AsyncPolicy _resiliencyAsyncPolicy;
 
         private Policy SyncRetryPolicyFactory => Policy
-                                                    .Handle<ExceptionType>()
-                                                    .WaitAndRetry(NUMBER_OF_RETRIES, retryAttempt =>
-                                                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
-                                                    );
+            .Handle<ExceptionType>()
+            .WaitAndRetry(NUMBER_OF_RETRIES, retryAttempt => TimeSpan.FromMilliseconds(500));
 
         private AsyncPolicy ASyncRetryPolicyFactory => Policy
-                                                    .Handle<ExceptionType> ()
-                                                    .WaitAndRetryAsync(NUMBER_OF_RETRIES, retryAttempt =>
-                                                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
-                                                    );
+            .Handle<ExceptionType>()
+            .WaitAndRetryAsync(NUMBER_OF_RETRIES, retryAttempt => TimeSpan.FromMilliseconds(500));
 
         public ResilientRepositoryDecorator(IRepository<Key, Entity> repository)
         {
