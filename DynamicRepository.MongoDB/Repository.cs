@@ -45,7 +45,7 @@ namespace DynamicRepository.MongoDB
                 AddExtraPagedDataFilter);
 
             var builtRepository = new RepositoryAddOnBuilder<Key, Entity>(_mongoDBRepository)
-                .AddResiliency()
+                .AddResiliency<MongoException>()
                 .Build();
 
             InitializeProxy(builtRepository);

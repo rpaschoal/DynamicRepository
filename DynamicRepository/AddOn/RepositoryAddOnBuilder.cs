@@ -12,14 +12,14 @@ namespace DynamicRepository.AddOn
             _repositoryBuild = providerRepositoryInstance;
         }
 
-        public RepositoryAddOnBuilder<Key, Entity> AddResiliency()
+        public RepositoryAddOnBuilder<Key, Entity> AddResiliency<ExceptionType>() where ExceptionType : Exception
         {
             if (_repositoryBuild == null)
             {
                 throw new Exception("No repository instance to add resiliency for the current DynamicRepository being built.");
             }
 
-            _repositoryBuild = new ResilientRepositoryDecorator<Key, Entity>(_repositoryBuild);
+            _repositoryBuild = new ResilientRepositoryDecorator<Key, Entity, ExceptionType>(_repositoryBuild);
             return this;
         }
 
