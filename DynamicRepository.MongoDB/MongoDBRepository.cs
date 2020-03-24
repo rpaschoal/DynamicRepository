@@ -58,11 +58,13 @@ namespace DynamicRepository.MongoDB
         /// <param name="collectionName">The name of the MongoDB collection to be used with this repository.</param>
         public MongoDBRepository(IMongoDatabase mongoDatabase, 
             string collectionName,
-            Func<PagedDataSettings, Expression<Func<Entity, bool>>> PreConditionsToPagedDataFilterDelegate,
-            Func<PagedDataSettings, Expression<Func<Entity, bool>>> ExtraPagedDataFilterDelegate)
+            Func<PagedDataSettings, Expression<Func<Entity, bool>>> preConditionsToPagedDataFilterDelegate,
+            Func<PagedDataSettings, Expression<Func<Entity, bool>>> extraPagedDataFilterDelegate)
         {
             _mongoDatabase = mongoDatabase;
             CollectionName = collectionName;
+            PreConditionsToPagedDataFilterDelegate = preConditionsToPagedDataFilterDelegate;
+            ExtraPagedDataFilterDelegate = extraPagedDataFilterDelegate;
 
             Collection = GetCollection<Entity>(collectionName);
 
