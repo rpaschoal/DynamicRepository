@@ -1,7 +1,5 @@
-﻿using DynamicRepository.Resiliency;
+﻿using DynamicRepository.AddOn.Resiliency;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DynamicRepository.AddOn
 {

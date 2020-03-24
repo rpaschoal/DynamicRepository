@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Polly;
 
-namespace DynamicRepository.Resiliency
+namespace DynamicRepository.AddOn.Resiliency
 {
     public sealed class ResilientRepositoryDecorator<Key, Entity> : IRepository<Key, Entity> where Entity : class
     {
