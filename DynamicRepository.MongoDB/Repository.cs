@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using DynamicRepository.AddOn;
+using MongoDB.Driver;
 
 namespace DynamicRepository.MongoDB
 {
@@ -13,6 +14,9 @@ namespace DynamicRepository.MongoDB
     /// </typeparam>
     public abstract class Repository<Key, Entity> : RepositoryProxy<Key, Entity>, IRepository<Key, Entity> where Entity : class, new()
     {
+        /// <summary>
+        /// Repository internals with data access methods for MongoDB.
+        /// </summary>
         private readonly MongoDBRepository<Key, Entity> _mongoDBRepository;
 
         /// <summary>
@@ -32,18 +36,19 @@ namespace DynamicRepository.MongoDB
         /// <param name="mongoDatabase">
         /// The mongo database to be interfaced and fetch the data.
         /// </param>
-        public Repository(IMongoDatabase mongoDatabase, string collectionName) : base(BuildInternals(mongoDatabase, collectionName, out var repositoryInternals))
+        /// <param name="collectionName">The collection name to be accessed by this repository.</param>
+        public Repository(IMongoDatabase mongoDatabase, string collectionName)
         {
-            _mongoDBRepository = repositoryInternals;
-        }
+            _mongoDBRepository = new MongoDBRepository<Key, Entity>(mongoDatabase,
+                collectionName,
+                AddPreConditionsPagedDataFilter,
+                AddExtraPagedDataFilter);
 
-        private static IRepository<Key, Entity> BuildInternals(IMongoDatabase mongoDatabase, string collectionName, out MongoDBRepository<Key, Entity> repositoryInternals)
-        {
-            repositoryInternals = new MongoDBRepository<Key, Entity>(mongoDatabase, collectionName);
-
-            return new RepositoryAddOnBuilder<Key, Entity>(repositoryInternals)
+            var builtRepository = new RepositoryAddOnBuilder<Key, Entity>(_mongoDBRepository)
                 .AddResiliency()
                 .Build();
+
+            InitializeProxy(builtRepository);
         }
     }
 }

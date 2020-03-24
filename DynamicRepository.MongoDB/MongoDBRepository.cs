@@ -45,14 +45,9 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
 
-        /// <summary>
-        /// Adds a global filter expression to all operations which query for data.
-        /// </summary>
-        /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
-        public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
-        {
-            GlobalFilter = filter;
-        }
+        private Func<PagedDataSettings, Expression<Func<Entity, bool>>> PreConditionsToPagedDataFilterDelegate { get; set; }
+
+        private Func<PagedDataSettings, Expression<Func<Entity, bool>>> ExtraPagedDataFilterDelegate { get; set; }
 
         /// <summary>
         /// Default constructor of this Repository.
@@ -61,7 +56,10 @@ namespace DynamicRepository.MongoDB
         /// The mongo database to be interfaced and fetch the data.
         /// </param>
         /// <param name="collectionName">The name of the MongoDB collection to be used with this repository.</param>
-        public MongoDBRepository(IMongoDatabase mongoDatabase, string collectionName)
+        public MongoDBRepository(IMongoDatabase mongoDatabase, 
+            string collectionName,
+            Func<PagedDataSettings, Expression<Func<Entity, bool>>> PreConditionsToPagedDataFilterDelegate,
+            Func<PagedDataSettings, Expression<Func<Entity, bool>>> ExtraPagedDataFilterDelegate)
         {
             _mongoDatabase = mongoDatabase;
             CollectionName = collectionName;
@@ -69,6 +67,15 @@ namespace DynamicRepository.MongoDB
             Collection = GetCollection<Entity>(collectionName);
 
             _dataPager = new DataPagerMongoDB<Key, Entity>();
+        }
+
+        /// <summary>
+        /// Adds a global filter expression to all operations which query for data.
+        /// </summary>
+        /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
+        public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
+        {
+            GlobalFilter = filter;
         }
 
         /// <summary>
@@ -245,39 +252,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Collection of filtered items result.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataPager.GetPagedData(GetQueryable(), settings, AddPreConditionsPagedDataFilter(settings), AddExtraPagedDataFilter(settings));
-        }
-
-        /// <summary>
-        /// Adds extra filter to PagedData method.
-        /// </summary>
-        /// <remarks>
-        /// Override this method in <see cref="Repository{Key, Entity}{Key, Entity}"/> implementation 
-        /// if you want to add custom filter to your paged data source.
-        /// </remarks>
-        /// <param name="settings">Current filter settings supplied by the consumer.</param>
-        /// <returns>Expression to be embedded to the IQueryable filter instance.</returns>
-        protected virtual Expression<Func<Entity, bool>> AddExtraPagedDataFilter(PagedDataSettings settings)
-        {
-            // Needs to be overriden by devs to add behavior to this. 
-            // Change the injected filter on concrete repositories.
-            return null;
-        }
-
-        /// <summary>
-        /// Adds precondition global filters to paged data source.
-        /// Rely on this if you want to add security filters.
-        /// </summary>
-        /// <remarks>
-        /// Override this method in <see cref="Repository{Key, Entity}{Key, Entity}"/> implementation 
-        /// if you want to add pre conditions global filters to your paged data source.
-        /// </remarks>
-        /// <param name="settings">Current filter settings supplied by the consumer.</param>
-        /// <returns>Expression to be embedded to the IQueryable filter instance.</returns>
-        protected virtual Expression<Func<Entity, bool>> AddPreConditionsPagedDataFilter(PagedDataSettings settings)
-        {
-            // Needs to be overriden by devs to add behavior to this.
-            return null;
+            return _dataPager.GetPagedData(GetQueryable(), settings, PreConditionsToPagedDataFilterDelegate(settings), ExtraPagedDataFilterDelegate(settings));
         }
     }
 }
