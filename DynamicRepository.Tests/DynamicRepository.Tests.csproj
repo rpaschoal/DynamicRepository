@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DynamicRepository.EFCore\DynamicRepository.EFCore.csproj" />
+    <ProjectReference Include="..\DynamicRepository.MongoDB\DynamicRepository.MongoDB.csproj" />
     <ProjectReference Include="..\DynamicRepository\DynamicRepository.csproj" />
   </ItemGroup>
 

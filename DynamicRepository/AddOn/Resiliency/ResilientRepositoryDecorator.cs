@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Polly;
 
@@ -13,7 +12,7 @@ namespace DynamicRepository.AddOn.Resiliency
         where Entity : class
         where ExceptionType : Exception
     {
-        private const int NUMBER_OF_RETRIES = 3;
+        private const int NUMBER_OF_RETRIES = 2;
         private readonly IRepository<Key, Entity> _repository;
         private readonly Policy _resiliencySyncPolicy;
         private readonly AsyncPolicy _resiliencyAsyncPolicy;
