@@ -120,6 +120,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual Task InsertAsync(Entity entity)
         {
+            // TODO: Cancellation tokens will be implement soon with another PR
             return DbSet.AddAsync(entity, CancellationToken.None).AsTask();
         }
 

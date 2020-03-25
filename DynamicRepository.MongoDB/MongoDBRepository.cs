@@ -45,8 +45,14 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
 
+        /// <summary>
+        /// Delegate supplied via constructor for pre-condition filtering.
+        /// </summary>
         private Func<PagedDataSettings, Expression<Func<Entity, bool>>> PreConditionsToPagedDataFilterDelegate { get; set; }
 
+        /// <summary>
+        /// Delegate supplied via constructor for extra paged data filtering.
+        /// </summary>
         private Func<PagedDataSettings, Expression<Func<Entity, bool>>> ExtraPagedDataFilterDelegate { get; set; }
 
         /// <summary>
@@ -228,6 +234,16 @@ namespace DynamicRepository.MongoDB
             return GlobalFilter != null ? Collection.AsQueryable().Where(GlobalFilter) : Collection.AsQueryable();
         }
 
+        /// <summary>
+        /// Filter, order and join the current entity based on criterias supplied as parameters.
+        /// </summary>
+        /// <param name="filter">Expression which supplies all desired filters.</param>
+        /// <param name="orderBy">Projetion to order the result.</param>
+        /// <param name="includeProperties">
+        /// Navigation properties that should be included on this query result. 
+        /// Ignore this if you have lazy loading enabled.
+        /// </param>
+        /// <returns>Fullfilled collection based on the criteria.</returns>
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
         {
             IQueryable<Entity> query = GetQueryable();
