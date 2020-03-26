@@ -23,12 +23,27 @@ namespace DynamicRepository.MongoDB
         /// <summary>
         /// Favoring composition on paged data.
         /// </summary>
-        private DataPager<Key, Entity> _dataPager;
+        private readonly DataPager<Key, Entity> _dataPager;
 
         /// <summary>
         /// The mongoDB database instance to access the desired collection for this repository.
         /// </summary>
-        private IMongoDatabase _mongoDatabase;
+        private readonly IMongoDatabase _mongoDatabase;
+
+        /// <summary>
+        /// Name of the Id property for each document of the collection being accessed.
+        /// </summary>
+        private readonly string _idPropertyName;
+
+        /// <summary>
+        /// Delegate supplied via constructor for pre-condition filtering.
+        /// </summary>
+        private readonly Func<PagedDataSettings, Expression<Func<Entity, bool>>> _preConditionsToPagedDataFilterDelegate;
+
+        /// <summary>
+        /// Delegate supplied via constructor for extra paged data filtering.
+        /// </summary>
+        private readonly Func<PagedDataSettings, Expression<Func<Entity, bool>>> _extraPagedDataFilterDelegate;
 
         /// <summary>
         /// Current MongoDB collection being used by this Repository instance.
@@ -46,16 +61,6 @@ namespace DynamicRepository.MongoDB
         private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
 
         /// <summary>
-        /// Delegate supplied via constructor for pre-condition filtering.
-        /// </summary>
-        private Func<PagedDataSettings, Expression<Func<Entity, bool>>> PreConditionsToPagedDataFilterDelegate { get; set; }
-
-        /// <summary>
-        /// Delegate supplied via constructor for extra paged data filtering.
-        /// </summary>
-        private Func<PagedDataSettings, Expression<Func<Entity, bool>>> ExtraPagedDataFilterDelegate { get; set; }
-
-        /// <summary>
         /// Default constructor of this Repository.
         /// </summary>
         /// <param name="mongoDatabase">
@@ -64,13 +69,15 @@ namespace DynamicRepository.MongoDB
         /// <param name="collectionName">The name of the MongoDB collection to be used with this repository.</param>
         public MongoDBRepository(IMongoDatabase mongoDatabase, 
             string collectionName,
+            string idPropertyName,
             Func<PagedDataSettings, Expression<Func<Entity, bool>>> preConditionsToPagedDataFilterDelegate,
             Func<PagedDataSettings, Expression<Func<Entity, bool>>> extraPagedDataFilterDelegate)
         {
             _mongoDatabase = mongoDatabase;
             CollectionName = collectionName;
-            PreConditionsToPagedDataFilterDelegate = preConditionsToPagedDataFilterDelegate;
-            ExtraPagedDataFilterDelegate = extraPagedDataFilterDelegate;
+            _idPropertyName = idPropertyName;
+            _preConditionsToPagedDataFilterDelegate = preConditionsToPagedDataFilterDelegate;
+            _extraPagedDataFilterDelegate = extraPagedDataFilterDelegate;
 
             Collection = GetCollection<Entity>(collectionName);
 
@@ -104,8 +111,7 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         protected FilterDefinition<Entity> GetIdFilter(Entity entity)
         {
-            // TODO: "Id" property name should be configurable
-            return Builders<Entity>.Filter.Eq("Id", entity.GetType().GetProperty("Id").GetValue(entity, null));
+            return Builders<Entity>.Filter.Eq(_idPropertyName, entity.GetType().GetProperty("Id").GetValue(entity, null));
         }
 
         /// <summary>
@@ -118,8 +124,7 @@ namespace DynamicRepository.MongoDB
         /// </example>
         protected FilterDefinition<Entity> GetIdFilter(Key id)
         {
-            // TODO: "Id" property name should be configurable
-            return Builders<Entity>.Filter.Eq("Id", id);
+            return Builders<Entity>.Filter.Eq(_idPropertyName, id);
         }
 
         /// <summary>
@@ -270,7 +275,7 @@ namespace DynamicRepository.MongoDB
         /// <returns>Collection of filtered items result.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataPager.GetPagedData(GetQueryable(), settings, PreConditionsToPagedDataFilterDelegate(settings), ExtraPagedDataFilterDelegate(settings));
+            return _dataPager.GetPagedData(GetQueryable(), settings, _preConditionsToPagedDataFilterDelegate(settings), _extraPagedDataFilterDelegate(settings));
         }
     }
 }

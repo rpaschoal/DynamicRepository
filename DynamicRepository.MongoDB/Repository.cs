@@ -37,10 +37,12 @@ namespace DynamicRepository.MongoDB
         /// The mongo database to be interfaced and fetch the data.
         /// </param>
         /// <param name="collectionName">The collection name to be accessed by this repository.</param>
-        public Repository(IMongoDatabase mongoDatabase, string collectionName)
+        /// <param name="idPropertyName">Name of the Id property for each document of the collection being accessed. Default is "Id".</param>
+        public Repository(IMongoDatabase mongoDatabase, string collectionName, string idPropertyName = "Id")
         {
             _mongoDBRepository = new MongoDBRepository<Key, Entity>(mongoDatabase,
                 collectionName,
+                idPropertyName,
                 AddPreConditionsPagedDataFilter,
                 AddExtraPagedDataFilter);
 
