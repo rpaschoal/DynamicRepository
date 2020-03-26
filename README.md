@@ -187,5 +187,6 @@ This project was implemented on top of these dependencies:
 
 * https://github.com/StefH/System.Linq.Dynamic.Core
 * https://github.com/scottksmith95/LINQKit
+* https://github.com/App-vNext/Polly
 
 Many thanks!
