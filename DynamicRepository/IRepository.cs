@@ -3,8 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
+[assembly: InternalsVisibleTo("DynamicRepository.EF")]
+[assembly: InternalsVisibleTo("DynamicRepository.EFCore")]
+[assembly: InternalsVisibleTo("DynamicRepository.MongoDB")]
+[assembly: InternalsVisibleTo("DynamicRepository.Tests")]
 namespace DynamicRepository
 {
     /// <summary>

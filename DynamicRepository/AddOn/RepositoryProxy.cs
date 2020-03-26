@@ -1,64 +1,48 @@
-﻿using System;
+﻿using DynamicRepository.Filter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Collections;
-using Microsoft.EntityFrameworkCore;
-using DynamicRepository.Filter;
-using DynamicRepository.Extensions;
+using System.Text;
 using System.Threading.Tasks;
-using System.Threading;
 
-namespace DynamicRepository.EFCore
+namespace DynamicRepository.AddOn
 {
     /// <summary>
-    /// Base repository for persistency model CRUD and advanced filtering operations.
+    /// Proxy wrapper for <see cref="IRepository{Key, Entity}"/> so internals can be intialized during runtime.
     /// </summary>
-    /// <typeparam name="Key">The key type of current entity type. For composed primary keys use a new class type definition or an <see cref="object[]"/> array.</typeparam>
-    /// <typeparam name="Entity">The type of the entity being persisted or retrieved.</typeparam>
-    public abstract class Repository<Key, Entity> : IRepository<Key, Entity> where Entity : class, new()
+    /// <typeparam name="Key">The key type of the entity being interfaced with through the current repository instance.</typeparam>
+    /// <typeparam name="Entity">The entity type for the current repository instance.</typeparam>
+    public class RepositoryProxy<Key, Entity> : IRepository<Key, Entity> where Entity : class
     {
-        private DataPager<Key, Entity> _dataSourcePager;
+        private IRepository<Key, Entity> _repositoryInternals;
+        private IRepository<Key, Entity> RepositoryInternals { 
+            get
+            {
+                if (_repositoryInternals == null)
+                {
+                    throw new NullReferenceException("Proxy internals were not initialized.");
+                }
 
-        /// <summary>
-        /// Current EF DBContext instance.
-        /// </summary>
-        protected DbContext Context { get; set; }
-
-        /// <summary>
-        /// DBSet of <see cref="Entity"/> extracted from <see cref="Context"/>.
-        /// </summary>
-        protected internal DbSet<Entity> DbSet;
-
-        /// <summary>
-        /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
-        /// </summary>
-        private Expression<Func<Entity, bool>> GlobalFilter { get; set; }
-
-        /// <summary>
-        /// Default constructor of main repository. 
-        /// Required dependencies are injected.
-        /// </summary>
-        /// <param name="context">Current EF context.</param>
-        public Repository(DbContext context)
-        {
-            Context = context;
-
-            // Configures current entity DB Set which is being manipulated
-            DbSet = context.Set<Entity>();
-
-            _dataSourcePager = new DataPager<Key, Entity>();
+                return _repositoryInternals;
+            } 
         }
 
         /// <summary>
-        /// Adds a global filter expression to all operations which query for data.
+        /// Proxies to be initialized just by DynamicRepository internals
         /// </summary>
-        /// <remarks>This method was inspired by "HasQueryFilter" found on EF Core.</remarks>
+        internal RepositoryProxy()
+        {
+        }
+
+        internal void InitializeProxy(IRepository<Key, Entity> internals)
+        {
+            _repositoryInternals = internals;
+        }
+
         public void HasGlobalFilter(Expression<Func<Entity, bool>> filter)
         {
-            GlobalFilter = filter;
+            RepositoryInternals.HasGlobalFilter(filter);
         }
 
         /// <summary>
@@ -68,19 +52,7 @@ namespace DynamicRepository.EFCore
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public virtual Entity Get(Key key)
         {
-            Entity queriedEntity;
-
-            if (key is Array)
-            {
-                // This is to handle entity framework find by composite key
-                queriedEntity = DbSet.Find((key as IEnumerable).Cast<object>().ToArray());
-            }
-            else
-            {
-                queriedEntity = DbSet.Find(key);
-            }
-
-            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
+            return RepositoryInternals.Get(key);
         }
 
         /// <summary>
@@ -88,21 +60,9 @@ namespace DynamicRepository.EFCore
         /// </summary>
         /// <param name="key">The desired entity key value.</param>
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
-        public virtual async Task<Entity> GetAsync(Key key)
+        public virtual Task<Entity> GetAsync(Key key)
         {
-            Entity queriedEntity;
-
-            if (key is Array)
-            {
-                // This is to handle entity framework find by composite key
-                queriedEntity = await DbSet.FindAsync((key as IEnumerable).Cast<object>().ToArray());
-            }
-            else
-            {
-                queriedEntity = await DbSet.FindAsync(key);
-            }
-
-            return GlobalFilter != null ? await new[] { queriedEntity }.AsQueryable().FirstOrDefaultAsync(GlobalFilter) : queriedEntity;
+            return RepositoryInternals.GetAsync(key);
         }
 
         /// <summary>
@@ -111,7 +71,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual void Insert(Entity entity)
         {
-            DbSet.Add(entity);
+            RepositoryInternals.Insert(entity);
         }
 
         /// <summary>
@@ -120,8 +80,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual Task InsertAsync(Entity entity)
         {
-            // TODO: Cancellation tokens will be implement soon with another PR
-            return DbSet.AddAsync(entity, CancellationToken.None).AsTask();
+            return RepositoryInternals.InsertAsync(entity);
         }
 
         /// <summary>
@@ -130,7 +89,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public virtual void Update(Entity entityToUpdate)
         {
-            Context.Entry(entityToUpdate).State = EntityState.Modified;
+            RepositoryInternals.Update(entityToUpdate);
         }
 
         /// <summary>
@@ -139,7 +98,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public virtual Task UpdateAsync(Entity entityToUpdate)
         {
-            return Task.Run(() => Context.Entry(entityToUpdate).State = EntityState.Modified);
+            return RepositoryInternals.UpdateAsync(entityToUpdate);
         }
 
         /// <summary>
@@ -148,16 +107,16 @@ namespace DynamicRepository.EFCore
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public virtual void Delete(Key id)
         {
-            Delete(Get(id));
+            RepositoryInternals.Delete(id);
         }
 
         /// <summary>
         /// Deletes an existing entity.
         /// </summary>
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
-        public virtual async Task DeleteAsync(Key id)
+        public virtual Task DeleteAsync(Key id)
         {
-            await DeleteAsync(await GetAsync(id));
+            return RepositoryInternals.DeleteAsync(id);
         }
 
         /// <summary>
@@ -166,10 +125,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
-            if (entityToDelete != null)
-            {
-                DbSet.Remove(entityToDelete);
-            }
+            RepositoryInternals.Delete(entityToDelete);
         }
 
         /// <summary>
@@ -178,12 +134,7 @@ namespace DynamicRepository.EFCore
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public Task DeleteAsync(Entity entityToDelete)
         {
-            if (entityToDelete != null)
-            {
-                return Task.Run(() => DbSet.Remove(entityToDelete));
-            }
-
-            return Task.CompletedTask;
+            return RepositoryInternals.DeleteAsync(entityToDelete);
         }
 
         /// <summary>
@@ -191,7 +142,7 @@ namespace DynamicRepository.EFCore
         /// </summary>
         public IEnumerable<Entity> ListAll()
         {
-            return GetQueryable();
+            return RepositoryInternals.ListAll();
         }
 
         /// <summary>
@@ -199,7 +150,7 @@ namespace DynamicRepository.EFCore
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return GlobalFilter != null ? DbSet.AsQueryable().Where(GlobalFilter) : DbSet.AsQueryable();
+            return RepositoryInternals.GetQueryable();
         }
 
         /// <summary>
@@ -217,26 +168,7 @@ namespace DynamicRepository.EFCore
             Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null,
             params string[] includeProperties)
         {
-            IQueryable<Entity> query = GetQueryable();
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            foreach (var includeProperty in includeProperties)
-            {
-                query = query.Include(includeProperty);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).ToList();
-            }
-            else
-            {
-                return query.ToList();
-            }
+            return RepositoryInternals.List(filter, orderBy, includeProperties);
         }
 
         /// <summary>
@@ -246,7 +178,7 @@ namespace DynamicRepository.EFCore
         /// <returns>Filled PagedData instance.</returns>
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
         {
-            return _dataSourcePager.GetPagedData(GetQueryable(), settings, AddPreConditionsPagedDataFilter(settings), AddExtraPagedDataFilter(settings));
+            return RepositoryInternals.GetPagedData(settings);
         }
 
         /// <summary>

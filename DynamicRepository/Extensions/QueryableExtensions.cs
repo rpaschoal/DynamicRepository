@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DynamicRepository.Extensions
 {
-    public static class QueryableExtensions
+    internal static class QueryableExtensions
     {
-        public delegate IList OnSelectCallback(IList fetchedResult);
+        internal delegate IList OnSelectCallback(IList fetchedResult);
 
         /// <summary>
         /// Converts an IQueryable result to a paged result set and applies post query filters to it.
@@ -18,7 +18,7 @@ namespace DynamicRepository.Extensions
         /// <param name="totalRecords">Total records in database for this entity based on previous paged query.</param>
         /// <param name="callback">Callback to execute code on memory projection selected by adapter.</param>
         /// <returns>WrapperEnumerator instance.</returns>
-        public static IPagedDataResult<T> BuildUpResult<T>(this IQueryable<T> self, int totalRecords, OnSelectCallback callback = null) where T : class
+        internal static IPagedDataResult<T> BuildUpResult<T>(this IQueryable<T> self, int totalRecords, OnSelectCallback callback = null) where T : class
         {
             return new PagedDataResult<T>(totalRecords)
             {

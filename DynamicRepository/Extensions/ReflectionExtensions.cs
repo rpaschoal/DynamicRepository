@@ -15,9 +15,9 @@ namespace DynamicRepository.Extensions
     /// <remarks>
     /// I changed the original method in order to make possible setting the value to a nested property.
     /// </remarks>
-    public static class ReflectionExtensions
+    internal static class ReflectionExtensions
     {
-        public static Object GetPropValue(this Object obj, String propName)
+        internal static Object GetPropValue(this Object obj, String propName)
         {
             string[] nameParts = propName.Split('.');
             if (nameParts.Length == 1)
@@ -38,7 +38,7 @@ namespace DynamicRepository.Extensions
             return obj;
         }
 
-        public static void SetPropValue(this Object obj, String propName, object value, bool setUnsafe = false)
+        internal static void SetPropValue(this Object obj, String propName, object value, bool setUnsafe = false)
         {
             string[] nameParts = propName.Split('.');
             if (nameParts.Length == 1 && !setUnsafe)
@@ -78,7 +78,7 @@ namespace DynamicRepository.Extensions
             }
         }
 
-        public static PropertyInfo GetNestedPropInfo(this Object obj, String propName)
+        internal static PropertyInfo GetNestedPropInfo(this Object obj, String propName)
         {
             try
             {
@@ -133,7 +133,7 @@ namespace DynamicRepository.Extensions
             }
         }
 
-        public static PropertyInfo GetNestedPropInfo(this Object obj, String propName, out int collectionPathTotal)
+        internal static PropertyInfo GetNestedPropInfo(this Object obj, String propName, out int collectionPathTotal)
         {
             collectionPathTotal = 0;
 
@@ -199,7 +199,7 @@ namespace DynamicRepository.Extensions
         /// <typeparam name="U"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public static string GetPropertyName<T, U>(Expression<Func<T, U>> expression)
+        internal static string GetPropertyName<T, U>(Expression<Func<T, U>> expression)
         {
             var member = expression.Body as MemberExpression;
             if (member != null)
@@ -211,7 +211,7 @@ namespace DynamicRepository.Extensions
         /// <summary>
         /// Replaces the value of a collection property within an object based on an EF Dynamic Query.
         /// </summary>
-        public static void ReplaceCollectionInstance(this object instanceHolder, string collectionPath, string query)
+        internal static void ReplaceCollectionInstance(this object instanceHolder, string collectionPath, string query)
         {
             if (!String.IsNullOrEmpty(query))
             {
@@ -235,7 +235,7 @@ namespace DynamicRepository.Extensions
         /// <summary>
         /// Rearranges the value of a collection property within an object based on an EF Dynamic OrderBy.
         /// </summary>
-        public static void RearrangeCollectionInstance(this object instanceHolder, string collectionPath, string orderBy)
+        internal static void RearrangeCollectionInstance(this object instanceHolder, string collectionPath, string orderBy)
         {
             if (!String.IsNullOrEmpty(orderBy))
             {
