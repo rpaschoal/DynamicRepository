@@ -19,7 +19,7 @@ namespace DynamicRepository.MongoDB
     /// <typeparam name="Entity">
     /// The Entity type mapped by the desired collection.
     /// </typeparam>
-    public class DataPagerMongoDB<Key, Entity> : DataPager<Key, Entity> where Entity : class, new()
+    internal class DataPagerMongoDB<Key, Entity> : DataPager<Key, Entity> where Entity : class, new()
     {
         /// <summary>
         /// Filters paged data based on <see cref="PagedDataSourceSettings"/>. 

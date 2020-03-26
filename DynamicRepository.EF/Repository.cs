@@ -52,7 +52,6 @@ namespace DynamicRepository.EF
         /// Required dependencies are injected.
         /// </summary>
         /// <param name="context">Current EF context.</param>
-        /// <param name="account">Current request account identification.</param>
         public Repository(DbContext context)
         {
             Context = context;

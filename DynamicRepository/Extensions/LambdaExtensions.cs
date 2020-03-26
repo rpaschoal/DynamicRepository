@@ -7,12 +7,12 @@ namespace DynamicRepository.Extensions
     /// <summary>
     /// C# Lambda helpers.
     /// </summary>
-    public static class LambdaExtensions
+    internal static class LambdaExtensions
     {
         /// <summary>
         /// Parses a string expression to strongly typed response Expression Lambda.
         /// </summary>
-        public static Expression<Func<Entity, bool>> ParseLambda<Entity>(this string expression, object[] parameters) where Entity : class, new()
+        internal static Expression<Func<Entity, bool>> ParseLambda<Entity>(this string expression, object[] parameters) where Entity : class, new()
         {
             if (!String.IsNullOrEmpty(expression))
             {
