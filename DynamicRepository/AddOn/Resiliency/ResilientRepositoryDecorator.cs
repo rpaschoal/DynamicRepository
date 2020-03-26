@@ -8,7 +8,13 @@ using Polly;
 
 namespace DynamicRepository.AddOn.Resiliency
 {
-    public sealed class ResilientRepositoryDecorator<Key, Entity, ExceptionType> : IRepository<Key, Entity>
+    /// <summary>
+    /// Adds resiliency to concrete implementations of <see cref="IRepository{Key, Entity}"/> by using Polly and retry mechanisms.
+    /// </summary>
+    /// <typeparam name="Key">The key type of the entity being interfaced with through the current repository instance.</typeparam>
+    /// <typeparam name="Entity">The entity type for the current repository instance.</typeparam>
+    /// <typeparam name="ExceptionType">The exception type that is going to be caught by the retry mechanism.</typeparam>
+    internal sealed class ResilientRepositoryDecorator<Key, Entity, ExceptionType> : IRepository<Key, Entity>
         where Entity : class
         where ExceptionType : Exception
     {
@@ -25,7 +31,7 @@ namespace DynamicRepository.AddOn.Resiliency
             .Handle<ExceptionType>()
             .WaitAndRetryAsync(NUMBER_OF_RETRIES, retryAttempt => TimeSpan.FromMilliseconds(500));
 
-        public ResilientRepositoryDecorator(IRepository<Key, Entity> repository)
+        internal ResilientRepositoryDecorator(IRepository<Key, Entity> repository)
         {
             _repository = repository;
             _resiliencySyncPolicy = SyncRetryPolicyFactory;

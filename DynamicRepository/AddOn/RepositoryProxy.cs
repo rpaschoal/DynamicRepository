@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace DynamicRepository.AddOn
 {
+    /// <summary>
+    /// Proxy wrapper for <see cref="IRepository{Key, Entity}"/> so internals can be intialized during runtime.
+    /// </summary>
+    /// <typeparam name="Key">The key type of the entity being interfaced with through the current repository instance.</typeparam>
+    /// <typeparam name="Entity">The entity type for the current repository instance.</typeparam>
     public class RepositoryProxy<Key, Entity> : IRepository<Key, Entity> where Entity : class
     {
         private IRepository<Key, Entity> _repositoryInternals;
@@ -23,7 +28,14 @@ namespace DynamicRepository.AddOn
             } 
         }
 
-        public void InitializeProxy(IRepository<Key, Entity> internals)
+        /// <summary>
+        /// Proxies to be initialized just by DynamicRepository internals
+        /// </summary>
+        internal RepositoryProxy()
+        {
+        }
+
+        internal void InitializeProxy(IRepository<Key, Entity> internals)
         {
             _repositoryInternals = internals;
         }
