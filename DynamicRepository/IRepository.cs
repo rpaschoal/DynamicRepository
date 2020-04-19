@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("DynamicRepository.EF")]
@@ -40,6 +41,14 @@ namespace DynamicRepository
         Task<Entity> GetAsync(Key id);
 
         /// <summary>
+        /// Gets an entity instance based on its <see cref="Key"/>.
+        /// </summary>
+        /// <param name="key">The desired entity key value.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        /// <returns>Persisted entity if found, otherwise NULL.</returns>
+        Task<Entity> GetAsync(Key id, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Persists a new entity model.
         /// </summary>
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
@@ -52,6 +61,13 @@ namespace DynamicRepository
         Task InsertAsync(Entity entity);
 
         /// <summary>
+        /// Persists a new entity model.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        Task InsertAsync(Entity entity, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Updates an existing persisted entity.
         /// </summary>
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
@@ -62,6 +78,13 @@ namespace DynamicRepository
         /// </summary>
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         Task UpdateAsync(Entity entityToUpdate);
+
+        /// <summary>
+        /// Updates an existing persisted entity.
+        /// </summary>
+        /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        Task UpdateAsync(Entity entityToUpdate, CancellationToken cancellationToken);
 
         /// <summary>
         /// Deletes an existing entity.
@@ -78,6 +101,13 @@ namespace DynamicRepository
         /// <summary>
         /// Deletes an existing entity.
         /// </summary>
+        /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        Task DeleteAsync(Key id, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         void Delete(Entity entityToDelete);
 
@@ -86,6 +116,13 @@ namespace DynamicRepository
         /// </summary>
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         Task DeleteAsync(Entity entityToDelete);
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        Task DeleteAsync(Entity entityToDelete, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns all entries of this entity.

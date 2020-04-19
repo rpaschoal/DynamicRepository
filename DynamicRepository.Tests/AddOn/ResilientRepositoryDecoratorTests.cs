@@ -4,6 +4,7 @@ using DynamicRepository.Tests.Support;
 using FluentAssertions;
 using Moq;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -68,7 +69,7 @@ namespace DynamicRepository.Tests.AddOn
             var testKey = 1;
 
             _repositoryInternalsMock
-                .Setup(x => x.DeleteAsync(testKey))
+                .Setup(x => x.DeleteAsync(testKey, CancellationToken.None))
                 .Throws<Exception>();
 
             // Act
@@ -77,7 +78,7 @@ namespace DynamicRepository.Tests.AddOn
             // Assert
             action.Should().Throw<Exception>();
 
-            _repositoryInternalsMock.Verify(x => x.DeleteAsync(testKey), Times.Exactly(NUMBER_OF_ATTEMPTS));
+            _repositoryInternalsMock.Verify(x => x.DeleteAsync(testKey, CancellationToken.None), Times.Exactly(NUMBER_OF_ATTEMPTS));
         }
 
         [Fact]
@@ -87,7 +88,7 @@ namespace DynamicRepository.Tests.AddOn
             var entityStub = new MockModel();
 
             _repositoryInternalsMock
-                .Setup(x => x.DeleteAsync(entityStub))
+                .Setup(x => x.DeleteAsync(entityStub, CancellationToken.None))
                 .Throws<Exception>();
 
             // Act
@@ -96,7 +97,7 @@ namespace DynamicRepository.Tests.AddOn
             // Assert
             action.Should().Throw<Exception>();
 
-            _repositoryInternalsMock.Verify(x => x.DeleteAsync(entityStub), Times.Exactly(NUMBER_OF_ATTEMPTS));
+            _repositoryInternalsMock.Verify(x => x.DeleteAsync(entityStub, CancellationToken.None), Times.Exactly(NUMBER_OF_ATTEMPTS));
         }
 
         [Fact]
@@ -125,7 +126,7 @@ namespace DynamicRepository.Tests.AddOn
             var testKey = 1;
 
             _repositoryInternalsMock
-                .Setup(x => x.GetAsync(testKey))
+                .Setup(x => x.GetAsync(testKey, CancellationToken.None))
                 .Throws<Exception>();
 
             // Act
@@ -134,7 +135,7 @@ namespace DynamicRepository.Tests.AddOn
             // Assert
             action.Should().Throw<Exception>();
 
-            _repositoryInternalsMock.Verify(x => x.GetAsync(testKey), Times.Exactly(NUMBER_OF_ATTEMPTS));
+            _repositoryInternalsMock.Verify(x => x.GetAsync(testKey, CancellationToken.None), Times.Exactly(NUMBER_OF_ATTEMPTS));
         }
 
         [Fact]
@@ -182,7 +183,7 @@ namespace DynamicRepository.Tests.AddOn
             var entityStub = new MockModel();
 
             _repositoryInternalsMock
-                .Setup(x => x.InsertAsync(entityStub))
+                .Setup(x => x.InsertAsync(entityStub, CancellationToken.None))
                 .Throws<Exception>();
 
             // Act
@@ -191,7 +192,7 @@ namespace DynamicRepository.Tests.AddOn
             // Assert
             action.Should().Throw<Exception>();
 
-            _repositoryInternalsMock.Verify(x => x.InsertAsync(entityStub), Times.Exactly(NUMBER_OF_ATTEMPTS));
+            _repositoryInternalsMock.Verify(x => x.InsertAsync(entityStub, CancellationToken.None), Times.Exactly(NUMBER_OF_ATTEMPTS));
         }
 
         [Fact]
@@ -258,7 +259,7 @@ namespace DynamicRepository.Tests.AddOn
             var entityStub = new MockModel();
 
             _repositoryInternalsMock
-                .Setup(x => x.UpdateAsync(entityStub))
+                .Setup(x => x.UpdateAsync(entityStub, CancellationToken.None))
                 .Throws<Exception>();
 
             // Act
@@ -267,7 +268,7 @@ namespace DynamicRepository.Tests.AddOn
             // Assert
             action.Should().Throw<Exception>();
 
-            _repositoryInternalsMock.Verify(x => x.UpdateAsync(entityStub), Times.Exactly(NUMBER_OF_ATTEMPTS));
+            _repositoryInternalsMock.Verify(x => x.UpdateAsync(entityStub, CancellationToken.None), Times.Exactly(NUMBER_OF_ATTEMPTS));
         }
     }
 }

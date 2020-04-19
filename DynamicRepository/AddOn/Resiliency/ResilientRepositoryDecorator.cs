@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Polly;
+using System.Threading;
 
 namespace DynamicRepository.AddOn.Resiliency
 {
@@ -60,12 +61,22 @@ namespace DynamicRepository.AddOn.Resiliency
 
         public Task DeleteAsync(Key id)
         {
-            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.DeleteAsync(id));
+            return DeleteAsync(id, CancellationToken.None);
+        }
+
+        public Task DeleteAsync(Key id, CancellationToken cancellationToken)
+        {
+            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.DeleteAsync(id, cancellationToken));
         }
 
         public Task DeleteAsync(Entity entityToDelete)
         {
-            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.DeleteAsync(entityToDelete));
+            return DeleteAsync(entityToDelete, CancellationToken.None);
+        }
+
+        public Task DeleteAsync(Entity entityToDelete, CancellationToken cancellationToken)
+        {
+            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.DeleteAsync(entityToDelete, cancellationToken));
         }
 
         public Entity Get(Key id)
@@ -75,7 +86,12 @@ namespace DynamicRepository.AddOn.Resiliency
 
         public Task<Entity> GetAsync(Key id)
         {
-            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.GetAsync(id));
+            return GetAsync(id, CancellationToken.None);
+        }
+
+        public Task<Entity> GetAsync(Key id, CancellationToken cancellationToken)
+        {
+            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.GetAsync(id, cancellationToken));
         }
 
         public IPagedDataResult<Entity> GetPagedData(PagedDataSettings settings)
@@ -90,7 +106,12 @@ namespace DynamicRepository.AddOn.Resiliency
 
         public Task InsertAsync(Entity entity)
         {
-            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.InsertAsync(entity));
+            return InsertAsync(entity, CancellationToken.None);
+        }
+
+        public Task InsertAsync(Entity entity, CancellationToken cancellationToken)
+        {
+            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.InsertAsync(entity, cancellationToken));
         }
 
         public IEnumerable<Entity> List(Expression<Func<Entity, bool>> filter = null, Func<IQueryable<Entity>, IOrderedQueryable<Entity>> orderBy = null, params string[] includeProperties)
@@ -110,7 +131,12 @@ namespace DynamicRepository.AddOn.Resiliency
 
         public Task UpdateAsync(Entity entityToUpdate)
         {
-            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.UpdateAsync(entityToUpdate));
+            return UpdateAsync(entityToUpdate, CancellationToken.None);
+        }
+
+        public Task UpdateAsync(Entity entityToUpdate, CancellationToken cancellationToken)
+        {
+            return _resiliencyAsyncPolicy.ExecuteAsync(async () => await _repository.UpdateAsync(entityToUpdate, cancellationToken));
         }
     }
 }

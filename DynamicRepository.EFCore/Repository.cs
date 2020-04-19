@@ -80,7 +80,7 @@ namespace DynamicRepository.EFCore
                 queriedEntity = DbSet.Find(key);
             }
 
-            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
+            return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -88,21 +88,32 @@ namespace DynamicRepository.EFCore
         /// </summary>
         /// <param name="key">The desired entity key value.</param>
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
-        public virtual async Task<Entity> GetAsync(Key key)
+        public virtual Task<Entity> GetAsync(Key key)
+        {
+            return GetAsync(key, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Gets an entity instance based on its <see cref="Key"/>.
+        /// </summary>
+        /// <param name="key">The desired entity key value.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        /// <returns>Persisted entity if found, otherwise NULL.</returns>
+        public virtual async Task<Entity> GetAsync(Key key, CancellationToken cancellationToken)
         {
             Entity queriedEntity;
 
             if (key is Array)
             {
                 // This is to handle entity framework find by composite key
-                queriedEntity = await DbSet.FindAsync((key as IEnumerable).Cast<object>().ToArray());
+                queriedEntity = await DbSet.FindAsync((key as IEnumerable).Cast<object>().ToArray(), cancellationToken: cancellationToken);
             }
             else
             {
-                queriedEntity = await DbSet.FindAsync(key);
+                queriedEntity = await DbSet.FindAsync(new object[] { key }, cancellationToken: cancellationToken);
             }
 
-            return GlobalFilter != null ? await new[] { queriedEntity }.AsQueryable().FirstOrDefaultAsync(GlobalFilter) : queriedEntity;
+            return GlobalFilter != null && queriedEntity != null ? await new[] { queriedEntity }.AsQueryable().FirstOrDefaultAsync(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -120,8 +131,17 @@ namespace DynamicRepository.EFCore
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public virtual Task InsertAsync(Entity entity)
         {
-            // TODO: Cancellation tokens will be implement soon with another PR
-            return DbSet.AddAsync(entity, CancellationToken.None).AsTask();
+            return InsertAsync(entity, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Persists a new entity model.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public virtual Task InsertAsync(Entity entity, CancellationToken cancellationToken)
+        {
+            return DbSet.AddAsync(entity, cancellationToken).AsTask();
         }
 
         /// <summary>
@@ -138,6 +158,16 @@ namespace DynamicRepository.EFCore
         /// </summary>
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public virtual Task UpdateAsync(Entity entityToUpdate)
+        {
+            return UpdateAsync(entityToUpdate, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Updates an existing persisted entity.
+        /// </summary>
+        /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public virtual Task UpdateAsync(Entity entityToUpdate, CancellationToken cancellationToken)
         {
             return Task.Run(() => Context.Entry(entityToUpdate).State = EntityState.Modified);
         }
@@ -157,7 +187,17 @@ namespace DynamicRepository.EFCore
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public virtual async Task DeleteAsync(Key id)
         {
-            await DeleteAsync(await GetAsync(id));
+            await DeleteAsync(id, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public virtual async Task DeleteAsync(Key id, CancellationToken cancellationToken)
+        {
+            await DeleteAsync(await GetAsync(id, cancellationToken), cancellationToken);
         }
 
         /// <summary>
@@ -177,6 +217,16 @@ namespace DynamicRepository.EFCore
         /// </summary>
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public Task DeleteAsync(Entity entityToDelete)
+        {
+            return DeleteAsync(entityToDelete, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public Task DeleteAsync(Entity entityToDelete, CancellationToken cancellationToken)
         {
             if (entityToDelete != null)
             {
