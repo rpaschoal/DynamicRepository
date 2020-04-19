@@ -80,7 +80,7 @@ namespace DynamicRepository.EFCore
                 queriedEntity = DbSet.Find(key);
             }
 
-            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
+            return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace DynamicRepository.EFCore
                 queriedEntity = await DbSet.FindAsync(new object[] { key }, cancellationToken: cancellationToken);
             }
 
-            return GlobalFilter != null ? await new[] { queriedEntity }.AsQueryable().FirstOrDefaultAsync(GlobalFilter) : queriedEntity;
+            return GlobalFilter != null && queriedEntity != null ? await new[] { queriedEntity }.AsQueryable().FirstOrDefaultAsync(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>

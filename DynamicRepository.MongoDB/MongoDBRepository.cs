@@ -137,7 +137,7 @@ namespace DynamicRepository.MongoDB
         {
             var queriedEntity = Collection.Find(GetIdFilter(id)).FirstOrDefault();
 
-            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
+            return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace DynamicRepository.MongoDB
         {
             var queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
 
-            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
+            return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
