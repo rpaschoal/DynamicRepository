@@ -12,6 +12,8 @@ With this package you get instant full CRUD data access for your project + advan
 
 You can find the NuGet packages here: https://www.nuget.org/packages?q=DynamicRepository
 
+_Note: EF6's DynamicRepository implementation only supports version 1.2.0 of DynamicRepository due to lack of netstandard2.1 support on .NET Framework 4.8_
+
 ## Features
 
 ### Full Crud Behavior
