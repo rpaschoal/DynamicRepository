@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DynamicRepository.MongoDB
@@ -144,11 +145,22 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         /// <param name="key">The desired entity key value.</param>
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
-        public async Task<Entity> GetAsync(Key id)
+        public Task<Entity> GetAsync(Key id)
         {
-            var queriedEntity = await (await Collection.FindAsync(GetIdFilter(id))).FirstOrDefaultAsync();
+            return GetAsync(id, CancellationToken.None);
+        }
 
-            return GlobalFilter != null ? new [] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
+        /// <summary>
+        /// Gets an entity instance based on its <see cref="Key"/>.
+        /// </summary>
+        /// <param name="key">The desired entity key value.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        /// <returns>Persisted entity if found, otherwise NULL.</returns>
+        public async Task<Entity> GetAsync(Key id, CancellationToken cancellationToken)
+        {
+            var queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+
+            return GlobalFilter != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
 
         /// <summary>
@@ -166,7 +178,17 @@ namespace DynamicRepository.MongoDB
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public Task InsertAsync(Entity entity)
         {
-            return Collection.InsertOneAsync(entity);
+            return InsertAsync(entity, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Persists a new entity model.
+        /// </summary>
+        /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public Task InsertAsync(Entity entity, CancellationToken cancellationToken)
+        {
+            return Collection.InsertOneAsync(entity, null, cancellationToken);
         }
 
         /// <summary>
@@ -184,7 +206,17 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public Task UpdateAsync(Entity entityToUpdate)
         {
-            return Collection.ReplaceOneAsync(GetIdFilter(entityToUpdate), entityToUpdate);
+            return UpdateAsync(entityToUpdate, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Updates an existing persisted entity.
+        /// </summary>
+        /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public Task UpdateAsync(Entity entityToUpdate, CancellationToken cancellationToken)
+        {
+            return Collection.ReplaceOneAsync(GetIdFilter(entityToUpdate), entityToUpdate, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -202,7 +234,17 @@ namespace DynamicRepository.MongoDB
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public Task DeleteAsync(Key id)
         {
-            return Collection.DeleteOneAsync(GetIdFilter(id));
+            return DeleteAsync(id, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public Task DeleteAsync(Key id, CancellationToken cancellationToken)
+        {
+            return Collection.DeleteOneAsync(GetIdFilter(id), cancellationToken);
         }
 
         /// <summary>
@@ -220,7 +262,17 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public Task DeleteAsync(Entity entityToDelete)
         {
-            return Collection.DeleteOneAsync(GetIdFilter(entityToDelete));
+            return DeleteAsync(entityToDelete, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Deletes an existing entity.
+        /// </summary>
+        /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
+        /// <param name="cancellationToken">A token used for cancelling propagation.</param>
+        public Task DeleteAsync(Entity entityToDelete, CancellationToken cancellationToken)
+        {
+            return Collection.DeleteOneAsync(GetIdFilter(entityToDelete), cancellationToken);
         }
 
         /// <summary>
