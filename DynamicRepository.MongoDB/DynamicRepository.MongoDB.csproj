@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Version>1.3.1</Version>
     <Authors>Rafael Carvalho</Authors>
-    <Description>Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects using EF6 (CoreCLR and .NET Framework 4.5.1), EF Core or MongoDB.</Description>
+    <Description>Dynamic repository with many built-in data access methods for Repository Pattern implementation for .NET projects using EF6, EF Core or MongoDB.</Description>
     <PackageProjectUrl>https://github.com/rpaschoal/DynamicRepository</PackageProjectUrl>
   </PropertyGroup>
 
