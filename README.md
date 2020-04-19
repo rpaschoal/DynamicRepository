@@ -6,7 +6,7 @@
 [![Nuget](https://img.shields.io/nuget/v/DynamicRepository.MongoDB.svg)](https://www.nuget.org/packages/DynamicRepository.MongoDB/)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://raw.githubusercontent.com/rpaschoal/DynamicRepository/master/LICENSE)
 
-Dynamic repository with many built-in data access and handling methods for Repository Pattern on ASP NET Core projects using EF6 (CoreCLR and .NET Framework 4.5.1), EF Core or MongoDB. 
+Dynamic repository with many built-in data access methods for Repository Pattern implementation for .NET projects using EF6, EF Core or MongoDB.
 
 With this package you get instant full CRUD data access for your project + advanced filtering methods with almost no additional code.
 
