@@ -183,6 +183,18 @@ This extension also supports Lambda expressions.
 
 The "settings" payload is available at this context and you can read all settings and its relevant values if you need to.
 
+### MongoDB Transactions
+
+The MongoDB package supports session transactions. Its repository class implements `ITransactionRegister`. Here's a usage example:
+
+```cs
+using var transaction = MyEntityRepository.StartTransaction();
+AnotherEntityRepository.RegisterTransaction(transaction);
+SomeOtherEntityRepository.RegisterTransaction(transaction);
+```
+
+To access these method APIs just mark/implement each repository contract with `ITransactionRegister`.
+
 ## Dependencies
 
 This project was implemented on top of these dependencies:
