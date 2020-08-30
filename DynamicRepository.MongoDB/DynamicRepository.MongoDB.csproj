@@ -2,16 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>1.3.2</Version>
+    <Version>1.3.3</Version>
     <Authors>Rafael Carvalho</Authors>
     <Description>Dynamic repository with many built-in data access methods for Repository Pattern implementation for .NET projects using EF6, EF Core or MongoDB.</Description>
     <PackageProjectUrl>https://github.com/rpaschoal/DynamicRepository</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DynamicRepository" Version="1.3.2" />
-    <PackageReference Include="MongoDB.Driver" Version="2.10.2" />
-    <PackageReference Include="MongoDB.Driver.Core" Version="2.10.2" />
+    <PackageReference Include="DynamicRepository" Version="1.3.5" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.1" />
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DynamicRepository\DynamicRepository.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,8 @@
 ﻿using DynamicRepository.AddOn;
+using DynamicRepository.Transaction;
 using MongoDB.Driver;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DynamicRepository.MongoDB
 {
@@ -12,7 +15,9 @@ namespace DynamicRepository.MongoDB
     /// <typeparam name="Entity">
     /// The Entity type mapped by the desired collection.
     /// </typeparam>
-    public abstract class Repository<Key, Entity> : RepositoryProxy<Key, Entity>, IRepository<Key, Entity> where Entity : class, new()
+    public abstract class Repository<Key, Entity> : RepositoryProxy<Key, Entity>,
+        ITransactionRegister,
+        IRepository<Key, Entity> where Entity : class, new()
     {
         /// <summary>
         /// Repository internals with data access methods for MongoDB.
@@ -51,6 +56,16 @@ namespace DynamicRepository.MongoDB
                 .Build();
 
             InitializeProxy(builtRepository);
+        }
+
+        public ITransaction StartTransaction()
+        {
+            return _mongoDBRepository.StartTransaction();
+        }
+
+        public void RegisterTransaction(ITransaction transaction)
+        {
+            _mongoDBRepository.RegisterTransaction(transaction);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DynamicRepository.Filter;
+using DynamicRepository.Transaction;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -19,7 +20,7 @@ namespace DynamicRepository.MongoDB
     /// <typeparam name="Entity">
     /// The Entity type mapped by the desired collection.
     /// </typeparam>
-    internal class MongoDBRepository<Key, Entity> : IRepository<Key, Entity> where Entity : class, new()
+    internal class MongoDBRepository<Key, Entity> : ITransactionRegister, IRepository<Key, Entity> where Entity : class, new()
     {
         /// <summary>
         /// Favoring composition on paged data.
@@ -55,6 +56,8 @@ namespace DynamicRepository.MongoDB
         /// The name of the MongoDB collection where the data for this entity is stored.
         /// </summary>
         protected string CollectionName { get; }
+
+        private MongoDBTransaction Transaction { get; set; }
 
         /// <summary>
         /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
@@ -128,6 +131,18 @@ namespace DynamicRepository.MongoDB
             return Builders<Entity>.Filter.Eq(_idPropertyName, id);
         }
 
+        public ITransaction StartTransaction()
+        {
+            Transaction = new MongoDBTransaction(_mongoDatabase.Client);
+
+            return Transaction;
+        }
+
+        public void RegisterTransaction(ITransaction transaction)
+        {
+            Transaction = transaction as MongoDBTransaction;
+        }
+
         /// <summary>
         /// Gets an entity instance based on its <see cref="Key"/>.
         /// </summary>
@@ -169,7 +184,14 @@ namespace DynamicRepository.MongoDB
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public void Insert(Entity entity)
         {
-            Collection.InsertOne(entity);
+            if (Transaction != null)
+            {
+                Collection.InsertOne(Transaction.Session, entity);
+            }
+            else
+            {
+                Collection.InsertOne(entity);
+            }
         }
 
         /// <summary>
@@ -188,7 +210,9 @@ namespace DynamicRepository.MongoDB
         /// <param name="cancellationToken">A token used for cancelling propagation.</param>
         public Task InsertAsync(Entity entity, CancellationToken cancellationToken)
         {
-            return Collection.InsertOneAsync(entity, null, cancellationToken);
+            return Transaction != null ?
+                Collection.InsertOneAsync(Transaction.Session, entity, null, cancellationToken)
+                : Collection.InsertOneAsync(entity, null, cancellationToken);
         }
 
         /// <summary>
@@ -197,7 +221,14 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public void Update(Entity entityToUpdate)
         {
-            Collection.ReplaceOne(GetIdFilter(entityToUpdate), entityToUpdate);
+            if (Transaction != null)
+            {
+                Collection.ReplaceOne(Transaction.Session, GetIdFilter(entityToUpdate), entityToUpdate);
+            }
+            else
+            {
+                Collection.ReplaceOne(GetIdFilter(entityToUpdate), entityToUpdate);
+            }
         }
 
         /// <summary>
@@ -216,7 +247,9 @@ namespace DynamicRepository.MongoDB
         /// <param name="cancellationToken">A token used for cancelling propagation.</param>
         public Task UpdateAsync(Entity entityToUpdate, CancellationToken cancellationToken)
         {
-            return Collection.ReplaceOneAsync(GetIdFilter(entityToUpdate), entityToUpdate, cancellationToken: cancellationToken);
+            return Transaction != null ? 
+                Collection.ReplaceOneAsync(Transaction.Session, GetIdFilter(entityToUpdate), entityToUpdate, cancellationToken: cancellationToken)
+                : Collection.ReplaceOneAsync(GetIdFilter(entityToUpdate), entityToUpdate, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -225,7 +258,14 @@ namespace DynamicRepository.MongoDB
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public void Delete(Key id)
         {
-            Collection.DeleteOne(GetIdFilter(id));
+            if (Transaction != null)
+            {
+                Collection.DeleteOne(Transaction.Session, GetIdFilter(id));
+            }
+            else
+            {
+                Collection.DeleteOne(GetIdFilter(id));
+            }
         }
 
         /// <summary>
@@ -244,7 +284,9 @@ namespace DynamicRepository.MongoDB
         /// <param name="cancellationToken">A token used for cancelling propagation.</param>
         public Task DeleteAsync(Key id, CancellationToken cancellationToken)
         {
-            return Collection.DeleteOneAsync(GetIdFilter(id), cancellationToken);
+            return Transaction != null ?
+                Collection.DeleteOneAsync(Transaction.Session, GetIdFilter(id), null, cancellationToken)
+                : Collection.DeleteOneAsync(GetIdFilter(id), cancellationToken);
         }
 
         /// <summary>
@@ -253,7 +295,14 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
-            Collection.DeleteOne(GetIdFilter(entityToDelete));
+            if (Transaction != null)
+            {
+                Collection.DeleteOne(Transaction.Session, GetIdFilter(entityToDelete));
+            }
+            else
+            {
+                Collection.DeleteOne(GetIdFilter(entityToDelete));
+            }
         }
 
         /// <summary>
