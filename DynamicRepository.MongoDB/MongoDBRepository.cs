@@ -57,7 +57,20 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         protected string CollectionName { get; }
 
-        private MongoDBTransaction Transaction { get; set; }
+
+        private MongoDBTransaction _transactionInstance;
+        private MongoDBTransaction Transaction 
+        { 
+            get
+            {
+                if (_transactionInstance != null && _transactionInstance.HasBeenDisposed)
+                {
+                    _transactionInstance = null;
+                }
+
+                return _transactionInstance;
+            }
+        }
 
         /// <summary>
         /// Global filter instance set by <see cref="HasGlobalFilter(Expression{Func{Entity, bool}})" />
@@ -133,14 +146,14 @@ namespace DynamicRepository.MongoDB
 
         public ITransaction StartTransaction()
         {
-            Transaction = new MongoDBTransaction(_mongoDatabase.Client);
+            _transactionInstance = new MongoDBTransaction(_mongoDatabase.Client);
 
             return Transaction;
         }
 
         public void RegisterTransaction(ITransaction transaction)
         {
-            Transaction = transaction as MongoDBTransaction;
+            _transactionInstance = transaction as MongoDBTransaction;
         }
 
         /// <summary>
