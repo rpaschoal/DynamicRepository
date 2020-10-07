@@ -10,6 +10,8 @@ namespace DynamicRepository.MongoDB
 	{
 		internal IClientSessionHandle Session { get; }
 
+		internal bool HasBeenDisposed { get; private set; }
+
 		public MongoDBTransaction(IMongoClient client, ClientSessionOptions clientSessionOptions = null)
 		{
 			Session = client.StartSession(clientSessionOptions);
@@ -29,6 +31,8 @@ namespace DynamicRepository.MongoDB
 
 		public void Dispose()
 		{
+			HasBeenDisposed = true;
+
 			Session.Dispose();
 		}
 	}
