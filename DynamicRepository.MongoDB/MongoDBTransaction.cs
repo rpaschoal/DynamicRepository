@@ -19,9 +19,19 @@ namespace DynamicRepository.MongoDB
 			Session.StartTransaction();
 		}
 
+		public void Commit()
+		{
+			Session.CommitTransaction();
+		}
+
 		public Task CommitAsync(CancellationToken cancellation = default)
 		{
 			return Session.CommitTransactionAsync(cancellation);
+		}
+
+		public void Abort()
+		{
+			Session.AbortTransaction();
 		}
 
 		public Task AbortAsync(CancellationToken cancellation = default)
