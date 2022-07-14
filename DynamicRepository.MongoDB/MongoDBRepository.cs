@@ -59,18 +59,28 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         protected string CollectionName { get; }
 
-
+        private readonly object _transactionLock = new object();
         private MongoDBTransaction _transactionInstance;
-        private MongoDBTransaction Transaction 
-        { 
+        private MongoDBTransaction Transaction
+        {
             get
             {
-                if (_transactionInstance != null && _transactionInstance.HasBeenDisposed)
+                lock (_transactionLock)
                 {
-                    _transactionInstance = null;
-                }
+                    if (_transactionInstance != null && _transactionInstance.HasBeenDisposed)
+                    {
+                        _transactionInstance = null;
+                    }
 
-                return _transactionInstance;
+                    return _transactionInstance;
+                }
+            }
+            set
+            {
+                lock (_transactionLock)
+                {
+                    _transactionInstance = value;
+                }
             }
         }
 
@@ -150,14 +160,14 @@ namespace DynamicRepository.MongoDB
 
         public ITransaction StartTransaction()
         {
-            _transactionInstance = new MongoDBTransaction(_mongoDatabase.Client);
+            Transaction = new MongoDBTransaction(_mongoDatabase.Client);
 
             return Transaction;
         }
 
         public void RegisterTransaction(ITransaction transaction)
         {
-            _transactionInstance = transaction as MongoDBTransaction;
+            Transaction = transaction as MongoDBTransaction;
         }
 
         private void EnlistWithCurrentTransactionScope()

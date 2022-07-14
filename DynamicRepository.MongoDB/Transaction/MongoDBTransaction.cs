@@ -21,21 +21,29 @@ namespace DynamicRepository.MongoDB.Transaction
 
         public void Commit()
         {
+            if (HasBeenDisposed) return;
+
             Session.CommitTransaction();
         }
 
         public Task CommitAsync(CancellationToken cancellation = default)
         {
+            if (HasBeenDisposed) return Task.CompletedTask;
+
             return Session.CommitTransactionAsync(cancellation);
         }
 
         public void Abort()
         {
+            if (HasBeenDisposed) return;
+
             Session.AbortTransaction();
         }
 
         public Task AbortAsync(CancellationToken cancellation = default)
         {
+            if (HasBeenDisposed) return Task.CompletedTask;
+
             return Session.AbortTransactionAsync(cancellation);
         }
 
