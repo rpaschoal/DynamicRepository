@@ -240,11 +240,15 @@ namespace DynamicRepository.MongoDB
             Entity queriedEntity;
             if (Transaction != null)
             {
-                queriedEntity = await (await Collection.FindAsync(Transaction.Session, GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+                queriedEntity = await (await Collection.FindAsync(Transaction.Session, GetIdFilter(id), cancellationToken: cancellationToken).ConfigureAwait(false))
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
             }
             else
             {
-                queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+                queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken).ConfigureAwait(false))
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
             }
 
             return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
