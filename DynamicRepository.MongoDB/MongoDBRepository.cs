@@ -204,11 +204,12 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public Entity Get(Key id)
         {
-            Entity queriedEntity = null;
-
+            Entity queriedEntity;
             if (Transaction != null)
             {
-                queriedEntity = Collection.Find(Transaction.Session, GetIdFilter(id)).FirstOrDefault();
+                queriedEntity = Collection
+                    .Find(Transaction.Session, GetIdFilter(id))
+                    .FirstOrDefault();
             }
             else
             {
@@ -236,11 +237,10 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public async Task<Entity> GetAsync(Key id, CancellationToken cancellationToken)
         {
-            Entity queriedEntity = null;
-
+            Entity queriedEntity;
             if (Transaction != null)
             {
-                queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+                queriedEntity = await (await Collection.FindAsync(Transaction.Session, GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
             }
             else
             {
