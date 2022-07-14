@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace DynamicRepository.MongoDB
 {
@@ -144,6 +145,8 @@ namespace DynamicRepository.MongoDB
             return Builders<Entity>.Filter.Eq(_idPropertyName, id);
         }
 
+        public TransactionScope StartTransactionScope() => new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
         public ITransaction StartTransaction()
         {
             _transactionInstance = new MongoDBTransaction(_mongoDatabase.Client);
@@ -154,6 +157,32 @@ namespace DynamicRepository.MongoDB
         public void RegisterTransaction(ITransaction transaction)
         {
             _transactionInstance = transaction as MongoDBTransaction;
+        }
+
+        private void EnlistWithCurrentTransactionScope()
+        {
+            if (System.Transactions.Transaction.Current != null)
+            {
+                var ambientTransactionId = System.Transactions.Transaction.Current.TransactionInformation.LocalIdentifier;
+
+                if (TransactionRegister.AmbientTransactions.ContainsKey(ambientTransactionId))
+                {
+                    RegisterTransaction(TransactionRegister.AmbientTransactions[ambientTransactionId]);
+                }
+                else
+                {
+                    StartTransaction();
+
+                    TransactionRegister.AmbientTransactions.TryAdd(ambientTransactionId, Transaction);
+
+                    System.Transactions.Transaction.Current.TransactionCompleted += (sender, e) => {
+                        TransactionRegister.AmbientTransactions.TryRemove(ambientTransactionId, out _);
+                    };
+
+                    var enlistment = new MongoDBTransactionScopeEnlistment(Transaction);
+                    System.Transactions.Transaction.Current.EnlistVolatile(enlistment, System.Transactions.EnlistmentOptions.None);
+                }
+            }
         }
 
         /// <summary>

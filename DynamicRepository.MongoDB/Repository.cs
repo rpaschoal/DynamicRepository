@@ -3,6 +3,7 @@ using DynamicRepository.Transaction;
 using MongoDB.Driver;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace DynamicRepository.MongoDB
 {
@@ -58,14 +59,10 @@ namespace DynamicRepository.MongoDB
             InitializeProxy(builtRepository);
         }
 
-        public ITransaction StartTransaction()
-        {
-            return _mongoDBRepository.StartTransaction();
-        }
+        public TransactionScope StartTransactionScope() => _mongoDBRepository.StartTransactionScope();
 
-        public void RegisterTransaction(ITransaction transaction)
-        {
-            _mongoDBRepository.RegisterTransaction(transaction);
-        }
+        public ITransaction StartTransaction() => _mongoDBRepository.StartTransaction();
+
+        public void RegisterTransaction(ITransaction transaction) => _mongoDBRepository.RegisterTransaction(transaction);
     }
 }
