@@ -1,7 +1,7 @@
 ﻿using DynamicRepository.Transaction;
 using System.Collections.Concurrent;
 
-namespace DynamicRepository.MongoDB
+namespace DynamicRepository.MongoDB.Transaction
 {
     internal static class TransactionRegister
     {

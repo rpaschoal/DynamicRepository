@@ -1,7 +1,7 @@
 ﻿using DynamicRepository.Transaction;
 using System.Transactions;
 
-namespace DynamicRepository.MongoDB
+namespace DynamicRepository.MongoDB.Transaction
 {
     internal class MongoDBTransactionScopeEnlistment : IEnlistmentNotification
     {
