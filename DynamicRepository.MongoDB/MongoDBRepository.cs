@@ -166,18 +166,18 @@ namespace DynamicRepository.MongoDB
             {
                 var ambientTransactionId = System.Transactions.Transaction.Current.TransactionInformation.LocalIdentifier;
 
-                if (TransactionRegister.AmbientTransactions.ContainsKey(ambientTransactionId))
+                if (AmbientTransactionRegister.AmbientTransactions.ContainsKey(ambientTransactionId))
                 {
-                    RegisterTransaction(TransactionRegister.AmbientTransactions[ambientTransactionId]);
+                    RegisterTransaction(AmbientTransactionRegister.AmbientTransactions[ambientTransactionId]);
                 }
                 else
                 {
                     StartTransaction();
 
-                    TransactionRegister.AmbientTransactions.TryAdd(ambientTransactionId, Transaction);
+                    AmbientTransactionRegister.AmbientTransactions.TryAdd(ambientTransactionId, Transaction);
 
                     System.Transactions.Transaction.Current.TransactionCompleted += (sender, e) => {
-                        TransactionRegister.AmbientTransactions.TryRemove(ambientTransactionId, out _);
+                        AmbientTransactionRegister.AmbientTransactions.TryRemove(ambientTransactionId, out _);
                     };
 
                     var enlistment = new MongoDBTransactionScopeEnlistment(Transaction);
