@@ -204,7 +204,16 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public Entity Get(Key id)
         {
-            var queriedEntity = Collection.Find(GetIdFilter(id)).FirstOrDefault();
+            Entity queriedEntity = null;
+
+            if (Transaction != null)
+            {
+                queriedEntity = Collection.Find(Transaction.Session, GetIdFilter(id)).FirstOrDefault();
+            }
+            else
+            {
+                queriedEntity = Collection.Find(GetIdFilter(id)).FirstOrDefault();
+            }
 
             return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
@@ -227,7 +236,16 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public async Task<Entity> GetAsync(Key id, CancellationToken cancellationToken)
         {
-            var queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+            Entity queriedEntity = null;
+
+            if (Transaction != null)
+            {
+                queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+            }
+            else
+            {
+                queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+            }
 
             return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
@@ -391,7 +409,14 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return GlobalFilter != null ? Collection.AsQueryable().Where(GlobalFilter) : Collection.AsQueryable();
+            if (Transaction != null)
+            {
+                return GlobalFilter != null ? Collection.AsQueryable(Transaction.Session).Where(GlobalFilter) : Collection.AsQueryable(Transaction.Session);
+            }
+            else
+            {
+                return GlobalFilter != null ? Collection.AsQueryable().Where(GlobalFilter) : Collection.AsQueryable();
+            }
         }
 
         /// <summary>
