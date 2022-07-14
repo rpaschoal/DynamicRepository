@@ -188,6 +188,7 @@ namespace DynamicRepository.MongoDB
 
                     System.Transactions.Transaction.Current.TransactionCompleted += (sender, e) => {
                         AmbientTransactionRegister.AmbientTransactions.TryRemove(ambientTransactionId, out _);
+                        Transaction = null;
                     };
 
                     var enlistment = new MongoDBTransactionScopeEnlistment(Transaction);
