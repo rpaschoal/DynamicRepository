@@ -1,4 +1,5 @@
 ﻿using DynamicRepository.Filter;
+using DynamicRepository.MongoDB.Transaction;
 using DynamicRepository.Transaction;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace DynamicRepository.MongoDB
 {
@@ -57,18 +59,28 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         protected string CollectionName { get; }
 
-
+        private readonly object _transactionLock = new object();
         private MongoDBTransaction _transactionInstance;
-        private MongoDBTransaction Transaction 
-        { 
+        private MongoDBTransaction Transaction
+        {
             get
             {
-                if (_transactionInstance != null && _transactionInstance.HasBeenDisposed)
+                lock (_transactionLock)
                 {
-                    _transactionInstance = null;
-                }
+                    if (_transactionInstance != null && _transactionInstance.HasBeenDisposed)
+                    {
+                        _transactionInstance = null;
+                    }
 
-                return _transactionInstance;
+                    return _transactionInstance;
+                }
+            }
+            set
+            {
+                lock (_transactionLock)
+                {
+                    _transactionInstance = value;
+                }
             }
         }
 
@@ -144,16 +156,45 @@ namespace DynamicRepository.MongoDB
             return Builders<Entity>.Filter.Eq(_idPropertyName, id);
         }
 
+        public TransactionScope StartTransactionScope() => new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
         public ITransaction StartTransaction()
         {
-            _transactionInstance = new MongoDBTransaction(_mongoDatabase.Client);
+            Transaction = new MongoDBTransaction(_mongoDatabase.Client);
 
             return Transaction;
         }
 
         public void RegisterTransaction(ITransaction transaction)
         {
-            _transactionInstance = transaction as MongoDBTransaction;
+            Transaction = transaction as MongoDBTransaction;
+        }
+
+        private void EnlistWithCurrentTransactionScope()
+        {
+            if (System.Transactions.Transaction.Current != null)
+            {
+                var ambientTransactionId = System.Transactions.Transaction.Current.TransactionInformation.LocalIdentifier;
+
+                if (AmbientTransactionRegister.AmbientTransactions.ContainsKey(ambientTransactionId))
+                {
+                    RegisterTransaction(AmbientTransactionRegister.AmbientTransactions[ambientTransactionId]);
+                }
+                else
+                {
+                    StartTransaction();
+
+                    AmbientTransactionRegister.AmbientTransactions.TryAdd(ambientTransactionId, Transaction);
+
+                    System.Transactions.Transaction.Current.TransactionCompleted += (sender, e) => {
+                        AmbientTransactionRegister.AmbientTransactions.TryRemove(ambientTransactionId, out _);
+                        Transaction = null;
+                    };
+
+                    var enlistment = new MongoDBTransactionScopeEnlistment(Transaction);
+                    System.Transactions.Transaction.Current.EnlistVolatile(enlistment, System.Transactions.EnlistmentOptions.None);
+                }
+            }
         }
 
         /// <summary>
@@ -163,7 +204,19 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public Entity Get(Key id)
         {
-            var queriedEntity = Collection.Find(GetIdFilter(id)).FirstOrDefault();
+            EnlistWithCurrentTransactionScope();
+
+            Entity queriedEntity;
+            if (Transaction != null)
+            {
+                queriedEntity = Collection
+                    .Find(Transaction.Session, GetIdFilter(id))
+                    .FirstOrDefault();
+            }
+            else
+            {
+                queriedEntity = Collection.Find(GetIdFilter(id)).FirstOrDefault();
+            }
 
             return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
@@ -186,7 +239,21 @@ namespace DynamicRepository.MongoDB
         /// <returns>Persisted entity if found, otherwise NULL.</returns>
         public async Task<Entity> GetAsync(Key id, CancellationToken cancellationToken)
         {
-            var queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken)).FirstOrDefaultAsync();
+            EnlistWithCurrentTransactionScope();
+
+            Entity queriedEntity;
+            if (Transaction != null)
+            {
+                queriedEntity = await (await Collection.FindAsync(Transaction.Session, GetIdFilter(id), cancellationToken: cancellationToken).ConfigureAwait(false))
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                queriedEntity = await (await Collection.FindAsync(GetIdFilter(id), cancellationToken: cancellationToken).ConfigureAwait(false))
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
+            }
 
             return GlobalFilter != null && queriedEntity != null ? new[] { queriedEntity }.AsQueryable().FirstOrDefault(GlobalFilter) : queriedEntity;
         }
@@ -197,6 +264,8 @@ namespace DynamicRepository.MongoDB
         /// <param name="entity">The new <see cref="Entity"/> instance to be persisted.</param>
         public void Insert(Entity entity)
         {
+            EnlistWithCurrentTransactionScope();
+
             if (Transaction != null)
             {
                 Collection.InsertOne(Transaction.Session, entity);
@@ -223,6 +292,8 @@ namespace DynamicRepository.MongoDB
         /// <param name="cancellationToken">A token used for cancelling propagation.</param>
         public Task InsertAsync(Entity entity, CancellationToken cancellationToken)
         {
+            EnlistWithCurrentTransactionScope();
+
             return Transaction != null ?
                 Collection.InsertOneAsync(Transaction.Session, entity, null, cancellationToken)
                 : Collection.InsertOneAsync(entity, null, cancellationToken);
@@ -234,6 +305,8 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToUpdate">The <see cref="Entity"/> instance to be updated.</param>
         public void Update(Entity entityToUpdate)
         {
+            EnlistWithCurrentTransactionScope();
+
             if (Transaction != null)
             {
                 Collection.ReplaceOne(Transaction.Session, GetIdFilter(entityToUpdate), entityToUpdate);
@@ -260,6 +333,8 @@ namespace DynamicRepository.MongoDB
         /// <param name="cancellationToken">A token used for cancelling propagation.</param>
         public Task UpdateAsync(Entity entityToUpdate, CancellationToken cancellationToken)
         {
+            EnlistWithCurrentTransactionScope();
+
             return Transaction != null ? 
                 Collection.ReplaceOneAsync(Transaction.Session, GetIdFilter(entityToUpdate), entityToUpdate, cancellationToken: cancellationToken)
                 : Collection.ReplaceOneAsync(GetIdFilter(entityToUpdate), entityToUpdate, cancellationToken: cancellationToken);
@@ -271,6 +346,8 @@ namespace DynamicRepository.MongoDB
         /// <param name="id">The primary key of the <see cref="Entity"/> to be deleted.</param>
         public void Delete(Key id)
         {
+            EnlistWithCurrentTransactionScope();
+
             if (Transaction != null)
             {
                 Collection.DeleteOne(Transaction.Session, GetIdFilter(id));
@@ -297,6 +374,8 @@ namespace DynamicRepository.MongoDB
         /// <param name="cancellationToken">A token used for cancelling propagation.</param>
         public Task DeleteAsync(Key id, CancellationToken cancellationToken)
         {
+            EnlistWithCurrentTransactionScope();
+
             return Transaction != null ?
                 Collection.DeleteOneAsync(Transaction.Session, GetIdFilter(id), null, cancellationToken)
                 : Collection.DeleteOneAsync(GetIdFilter(id), cancellationToken);
@@ -308,6 +387,8 @@ namespace DynamicRepository.MongoDB
         /// <param name="entityToDelete">The <see cref="Entity"/> instance to be deleted.</param>
         public void Delete(Entity entityToDelete)
         {
+            EnlistWithCurrentTransactionScope();
+
             if (Transaction != null)
             {
                 Collection.DeleteOne(Transaction.Session, GetIdFilter(entityToDelete));
@@ -334,7 +415,16 @@ namespace DynamicRepository.MongoDB
         /// <param name="cancellationToken">A token used for cancelling propagation.</param>
         public Task DeleteAsync(Entity entityToDelete, CancellationToken cancellationToken)
         {
-            return Collection.DeleteOneAsync(GetIdFilter(entityToDelete), cancellationToken);
+            EnlistWithCurrentTransactionScope();
+
+            if (Transaction != null)
+            {
+                return Collection.DeleteOneAsync(Transaction.Session, GetIdFilter(entityToDelete), null, cancellationToken);
+            }
+            else
+            {
+                return Collection.DeleteOneAsync(GetIdFilter(entityToDelete), cancellationToken);
+            }
         }
 
         /// <summary>
@@ -350,7 +440,16 @@ namespace DynamicRepository.MongoDB
         /// </summary>
         public IQueryable<Entity> GetQueryable()
         {
-            return GlobalFilter != null ? Collection.AsQueryable().Where(GlobalFilter) : Collection.AsQueryable();
+            EnlistWithCurrentTransactionScope();
+
+            if (Transaction != null)
+            {
+                return GlobalFilter != null ? Collection.AsQueryable(Transaction.Session).Where(GlobalFilter) : Collection.AsQueryable(Transaction.Session);
+            }
+            else
+            {
+                return GlobalFilter != null ? Collection.AsQueryable().Where(GlobalFilter) : Collection.AsQueryable();
+            }
         }
 
         /// <summary>

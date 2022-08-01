@@ -51,21 +51,21 @@ namespace DynamicRepository.Tests.MongoDB
             _mongoCollectionMock.Verify(x => x.InsertOne(mockModelStub, null, default), Times.Exactly(retryAttempts));
         }
 
-        [Fact]
-        public void ShouldUseAbstractDelegatesWhenPagingData()
-        {
-            // Act
-            // HACK as "AsQueryable" can't be mocked
-            try
-            {
-                _subject.GetPagedData(new PagedDataSettings());
-            }
-            catch (Exception){}
+        //[Fact]
+        //public void ShouldUseAbstractDelegatesWhenPagingData()
+        //{
+        //    // Act
+        //    // HACK as "AsQueryable" can't be mocked
+        //    try
+        //    {
+        //        _subject.GetPagedData(new PagedDataSettings());
+        //    }
+        //    catch (Exception){}
 
-            // Assert
-            _subject.HasAddPreConditionsPagedDataFilterBeenInvoked.Should().BeTrue();
-            _subject.HasAddExtraPagedDataFilterBeenInvoked.Should().BeTrue();
-        }
+        //    // Assert
+        //    _subject.HasAddPreConditionsPagedDataFilterBeenInvoked.Should().BeTrue();
+        //    _subject.HasAddExtraPagedDataFilterBeenInvoked.Should().BeTrue();
+        //}
 
         private class TestableException : MongoException
         {
